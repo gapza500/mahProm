@@ -6,117 +6,200 @@
 //
 
 import SwiftUI
+import PetReadyShared
 
 struct ContentView: View {
+    @EnvironmentObject var authService: AuthService
+    
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // Header
-                HStack {
-                    Image(systemName: "pawprint.fill")
-                        .font(.largeTitle)
-                        .foregroundColor(.blue)
-                    Text("PetReady Owner")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    Spacer()
+        TabView {
+            OwnerHomeView()
+                .tabItem { 
+                    Label("Home", systemImage: "house.fill")
                 }
-                .padding()
 
-                // Pet Status Cards
-                ScrollView {
-                    VStack(spacing: 16) {
-                        // My Pets Card
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Image(systemName: "heart.fill")
-                                    .foregroundColor(.red)
-                                Text("My Pets")
+            OwnerPetsView()
+                .tabItem { 
+                    Label("Pets", systemImage: "pawprint.fill")
+                }
+
+            OwnerHealthView()
+                .tabItem { 
+                    Label("Health", systemImage: "cross.case.fill")
+                }
+
+            OwnerClinicsView()
+                .tabItem { 
+                    Label("Clinics", systemImage: "map.fill")
+                }
+
+            OwnerChatView()
+                .tabItem { 
+                    Label("Chat", systemImage: "bubble.left.and.bubble.right.fill")
+                }
+
+            OwnerInfoView()
+                .tabItem { 
+                    Label("Info", systemImage: "info.circle.fill")
+                }
+
+            OwnerSettingsView()
+                .tabItem { 
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
+        }
+    }
+}
+
+private struct OwnerHomeView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Your Pets") {
+                    ForEach(0..<3, id: \.self) { index in
+                        HStack {
+                            Image(systemName: "pawprint.fill")
+                                .foregroundStyle(.blue)
+                            VStack(alignment: .leading) {
+                                Text("Pet \(index + 1)")
                                     .font(.headline)
-                                Spacer()
-                                Text("3")
-                                    .font(.title2)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.blue)
-                            }
-
-                            HStack(spacing: 12) {
-                                ForEach(0..<3) { index in
-                                    VStack {
-                                        Circle()
-                                            .fill(Color.gray.opacity(0.3))
-                                            .frame(width: 60, height: 60)
-                                            .overlay(
-                                                Image(systemName: "pawprint")
-                                                    .foregroundColor(.white)
-                                            )
-                                        Text("Pet \(index + 1)")
-                                            .font(.caption)
-                                    }
-                                }
+                                Text("Tap to view profile")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .shadow(radius: 2)
-
-                        // Quick Actions
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Quick Actions")
-                                .font(.headline)
-
-                            HStack(spacing: 12) {
-                                Button(action: {}) {
-                                    VStack {
-                                        Image(systemName: "cross.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.red)
-                                        Text("Vet Chat")
-                                            .font(.caption)
-                                    }
-                                }
-                                .buttonStyle(PlainButtonStyle())
-
-                                Button(action: {}) {
-                                    VStack {
-                                        Image(systemName: "location.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.green)
-                                        Text("Find Clinic")
-                                            .font(.caption)
-                                    }
-                                }
-                                .buttonStyle(PlainButtonStyle())
-
-                                Button(action: {}) {
-                                    VStack {
-                                        Image(systemName: "star.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.yellow)
-                                        Text("Health")
-                                            .font(.caption)
-                                    }
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .shadow(radius: 2)
                     }
-                    .padding()
                 }
 
-                Spacer()
+                Section("Next Actions") {
+                    Label("Scan barcode to add pet", systemImage: "barcode.viewfinder")
+                    Label("Issue digital health QR", systemImage: "qrcode")
+                    Label("Create SOS request", systemImage: "exclamationmark.triangle.fill")
+                }
             }
-            .background(Color.gray.opacity(0.1))
-            .navigationBarHidden(true)
+            .navigationTitle("Owner Home")
+        }
+    }
+}
+
+private struct OwnerPetsView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(0..<5, id: \.self) { index in
+                    NavigationLink("Fluffy \(index + 1)", destination: Text("Pet detail placeholder"))
+                }
+            }
+            .navigationTitle("Pets")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Add") {}
+                }
+            }
+        }
+    }
+}
+
+private struct OwnerHealthView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Upcoming Vaccines") {
+                    ForEach(0..<2, id: \.self) { _ in
+                        VStack(alignment: .leading) {
+                            Text("Rabies Booster")
+                                .font(.headline)
+                            Text("Due in 7 days")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Section("Treatment Timeline") {
+                    ForEach(0..<3, id: \.self) { _ in
+                        Text("Visit summary placeholder")
+                    }
+                }
+            }
+            .navigationTitle("Health")
+        }
+    }
+}
+
+private struct OwnerClinicsView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(0..<4, id: \.self) { index in
+                    VStack(alignment: .leading) {
+                        Text("Vet Clinic \(index + 1)")
+                            .font(.headline)
+                        Text("Tap to view map, promotions, booking")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .navigationTitle("Clinics")
+        }
+    }
+}
+
+private struct OwnerChatView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Waiting Queue") {
+                    Label("Dr. Siri — ETA 5 min", systemImage: "timer")
+                }
+                Section("Conversations") {
+                    ForEach(0..<2, id: \.self) { _ in
+                        NavigationLink("Vet chat placeholder", destination: Text("Chat room"))
+                    }
+                }
+            }
+            .navigationTitle("Chat")
+        }
+    }
+}
+
+private struct OwnerInfoView: View {
+    var body: some View {
+        NavigationStack {
+            List {
+                Section("Government Alerts") {
+                    Label("Heat advisory for Bangkok", systemImage: "megaphone.fill")
+                }
+                Section("Education") {
+                    Label("Puppy care basics", systemImage: "book.fill")
+                    Label("Vaccination FAQ", systemImage: "questionmark.circle")
+                }
+            }
+            .navigationTitle("Information")
+        }
+    }
+}
+
+private struct OwnerSettingsView: View {
+    @EnvironmentObject var authService: AuthService
+    
+    var body: some View {
+        NavigationStack {
+            List {
+                NavigationLink("Profile", destination: Text("Profile screen placeholder"))
+                NavigationLink("Notifications", destination: Text("Notification controls"))
+                NavigationLink("Language", destination: Text("TH / EN picker"))
+                Button("Logout") {
+                    authService.logout()
+                }
+                .foregroundColor(.red)
+            }
+            .navigationTitle("Settings")
         }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AuthService(apiClient: APIClient(baseURL: URL(string: "https://api.petready.app/v1")!)))
 }

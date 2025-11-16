@@ -309,6 +309,11 @@ PetReady-Ecosystem/
 - Set CI (Fastlane) and TestFlight builds for quick feedback.
 - Integrate a real backend when ready (swap APIClient mocks).
 
+## Documentation Map
+- Full index: [`Documentation/README.md`](Documentation/README.md)
+- Specs & rules now live under `Documentation/Specs` and `Documentation/Guidelines`.
+- Dev setup/roadmaps live in `Documentation/Development`.
+
 ---
 
 **Contact & License**

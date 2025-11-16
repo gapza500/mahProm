@@ -1,0 +1,18 @@
+database:
+  provider: sqlite-memory
+  container_identifier: TestContainer
+  local_cache: :memory:
+api:
+  base_url: https://api-test.petready.app/v1
+  websocket_url: wss://ws-test.petready.app
+maps:
+  google_maps_key: TEST_KEY
+authentication:
+  phone_verification: false
+  email_verification: false
+features:
+  enable_chat: true
+  enable_sos: false
+  enable_government_alerts: false
+logging:
+  level: debug

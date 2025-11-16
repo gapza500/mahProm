@@ -1,93 +1,77 @@
-//
-//  ContentView.swift
-//  PetReadyVetPro
-//
-//  Created by - Jhongi on 16/11/2568 BE.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     @State private var selectedRole: UserRole = .vet
 
-    enum UserRole: String, CaseIterable {
+    enum UserRole: String, CaseIterable, Identifiable {
         case vet = "Vet"
         case clinicAdmin = "Clinic Admin"
+
+        var id: String { rawValue }
     }
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Role Switcher
+        NavigationStack {
+            VStack {
                 Picker("Role", selection: $selectedRole) {
-                    ForEach(UserRole.allCases, id: \.self) { role in
+                    ForEach(UserRole.allCases) { role in
                         Text(role.rawValue).tag(role)
                     }
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(.segmented)
                 .padding()
 
-                // Content based on selected role
                 if selectedRole == .vet {
-                    VetView()
+                    VetDashboard()
                 } else {
-                    ClinicAdminView()
+                    ClinicAdminDashboard()
                 }
             }
-            .navigationTitle("PetReady VetPro")
-            .background(Color.gray.opacity(0.1))
+            .navigationTitle("VetPro")
         }
     }
 }
 
-struct VetView: View {
+private struct VetDashboard: View {
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Queue Status
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Image(systemName: "person.3.fill")
-                            .foregroundColor(.blue)
-                        Text("Consultation Queue")
-                            .font(.headline)
-                        Spacer()
-                        Text("5 waiting")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.red)
-                    }
+        List {
+            Section("Today’s Patients") {
+                ForEach(0..<3, id: \.self) { idx in
+                    NavigationLink("Patient #\(idx + 1)", destination: Text("Patient detail placeholder"))
                 }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 2)
             }
-            .padding()
+
+            Section("Consultation Queue") {
+                Label("5 waiting • Avg wait 4m", systemImage: "timer")
+                Label("Next escalation in 10m", systemImage: "bolt.fill")
+            }
+
+            Section("Quick Actions") {
+                Label("Open tele-chat room", systemImage: "message.fill")
+                Label("Send prescription", systemImage: "pills.fill")
+                Label("Start video handoff", systemImage: "video.fill")
+            }
         }
     }
 }
 
-struct ClinicAdminView: View {
+private struct ClinicAdminDashboard: View {
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Clinic Overview
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Image(systemName: "building.2.fill")
-                            .foregroundColor(.purple)
-                        Text("Clinic Overview")
-                            .font(.headline)
-                        Spacer()
-                    }
-                }
-                .padding()
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 2)
+        List {
+            Section("Clinic Overview") {
+                Label("Operating hours set", systemImage: "clock")
+                Label("4 vets on shift", systemImage: "person.3.fill")
             }
-            .padding()
+
+            Section("Campaigns") {
+                NavigationLink("Wellness Week Promo", destination: Text("Campaign builder placeholder"))
+                NavigationLink("Vaccination Drive", destination: Text("Campaign analytics placeholder"))
+            }
+
+            Section("Staff Management") {
+                NavigationLink("Schedules", destination: Text("Schedule board"))
+                NavigationLink("Permissions", destination: Text("Role management"))
+            }
         }
     }
 }

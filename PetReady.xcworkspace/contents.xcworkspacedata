@@ -13,4 +13,7 @@
    <FileRef
       location = "group:PetReadyVetPro/PetReadyVetPro.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Package.swift">
+   </FileRef>
 </Workspace>

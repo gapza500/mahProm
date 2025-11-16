@@ -1,0 +1,16 @@
+# macOS / Xcode
+.DS_Store
+DerivedData/
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# Node
+node_modules/
+package-lock.json
+
+# Env
+.env
+.swiftpm/

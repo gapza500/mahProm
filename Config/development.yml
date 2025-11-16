@@ -1,0 +1,18 @@
+database:
+  provider: cloudkit
+  container_identifier: iCloud.com.petready.dev
+  local_cache: PetReadyDev.sqlite
+api:
+  base_url: https://api-dev.petready.app/v1
+  websocket_url: wss://ws-dev.petready.app
+maps:
+  google_maps_key: ${GOOGLE_MAPS_API_KEY}
+authentication:
+  phone_verification: true
+  email_verification: true
+features:
+  enable_chat: true
+  enable_sos: true
+  enable_government_alerts: true
+logging:
+  level: debug

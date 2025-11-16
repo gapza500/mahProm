@@ -1,0 +1,18 @@
+database:
+  provider: cloudkit
+  container_identifier: iCloud.com.petready.staging
+  local_cache: PetReadyStaging.sqlite
+api:
+  base_url: https://api-staging.petready.app/v1
+  websocket_url: wss://ws-staging.petready.app
+maps:
+  google_maps_key: ${GOOGLE_MAPS_API_KEY}
+authentication:
+  phone_verification: true
+  email_verification: true
+features:
+  enable_chat: true
+  enable_sos: true
+  enable_government_alerts: true
+logging:
+  level: info

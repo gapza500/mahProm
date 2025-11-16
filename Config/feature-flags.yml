@@ -1,0 +1,12 @@
+chat:
+  enabled: true
+  sla_minutes: 15
+sos:
+  enabled: true
+  first_position_threshold_seconds: 5
+barcode_registration:
+  enabled: true
+  regex: '^PET-(DOG|CAT|RAB|OTH)-\\d{4}-\\d{6}-[0-9A-Z]{2}$'
+realtime_notifications:
+  push: true
+  websocket: true

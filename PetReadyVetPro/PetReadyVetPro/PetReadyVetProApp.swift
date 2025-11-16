@@ -6,12 +6,33 @@
 //
 
 import SwiftUI
+import Combine
+import PetReadyShared
 
 @main
 struct PetReadyVetProApp: App {
+    @StateObject private var appContext = VetProAppContext()
+
+    init() {
+        AppBootstrap.configureFirebaseIfNeeded()
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SplashScreenContainer(appName: "PetReady VetPro", accentColor: Color(red: 0.63, green: 0.45, blue: 0.90)) {
+                ContentView()
+                    .environmentObject(appContext)
+            }
         }
+    }
+}
+
+final class VetProAppContext: ObservableObject {
+    let chatService: ChatService
+
+    init() {
+        let url = URL(string: "wss://ws.petready.app")!
+        let socket = SocketConnection(url: url)
+        chatService = ChatService(socketConnection: socket)
     }
 }
