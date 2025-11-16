@@ -8,9 +8,9 @@
       location = "group:PetReadyRider/PetReadyRider.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:PetReadyVetPro/PetReadyVetPro.xcodeproj">
+      location = "group:PetReadyOwner/PetReadyOwner.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:PetReadyOwner/PetReadyOwner.xcodeproj">
+      location = "group:PetReadyVetPro/PetReadyVetPro.xcodeproj">
    </FileRef>
 </Workspace>
