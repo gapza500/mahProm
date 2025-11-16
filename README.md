@@ -312,6 +312,7 @@ PetReady-Ecosystem/
 ## Documentation Map
 - Full index: [`Documentation/README.md`](Documentation/README.md)
 - Specs & rules now live under `Documentation/Specs` and `Documentation/Guidelines`.
+- See [`navigation_plan.md`](Documentation/Specs/navigation_plan.md) for tab structures per app.
 - Dev setup/roadmaps live in `Documentation/Development`.
 
 ---

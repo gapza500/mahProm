@@ -4,6 +4,7 @@ Use this index to jump to the guide you need:
 
 ## Specs
 - [petready_spec.md](Specs/petready_spec.md)
+- [navigation_plan.md](Specs/navigation_plan.md)
 
 ## Guidelines
 - [PROJECT_RULES.md](Guidelines/PROJECT_RULES.md)
