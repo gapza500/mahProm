@@ -29,7 +29,8 @@ Each feature folder contains:
 
 ## Status
 - ✅ Owner app migrated to the new structure; shared helpers moved into `Features/Components/OwnerUIComponents.swift`.
-- 🔜 Repeat the process for VetPro/Rider/CentralAdmin to unblock parallel edits.
+- ✅ VetPro app migrated (Dashboard/Patients/Queue/Content/Settings folders + shared components).
+- 🔜 Repeat the process for Rider/CentralAdmin to unblock parallel edits.
 - 🔜 Share Xcode schemes so every developer sees all four targets automatically (`Product > Scheme > Manage Schemes… -> Shared`).
 
 ## Next Steps
