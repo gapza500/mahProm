@@ -81,6 +81,7 @@ _Target: Swift 5.5+, SwiftUI, iOS 16+, 4-App Architecture_
 ### **PetReady CentralAdmin App** (Government Oversight)
 **System Management:**
 1. **Admin Dashboard**: System overview, real-time monitoring, analytics
+2. **Pet Registration Feed**: Live Firestore-backed table that lists the most recent owner pet submissions, giving ops instant confirmation that barcode registration succeeded.
 2. **User Management**: Approve/reject vet and rider registrations, user oversight
 3. **Problem Resolution**: Issue tracking, debugging tools, user communication
 4. **Government Announcements**: Public health alerts, emergency coordination

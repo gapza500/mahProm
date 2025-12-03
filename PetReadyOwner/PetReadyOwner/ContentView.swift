@@ -53,6 +53,9 @@ struct ContentView: View {
 }
 
 private struct OwnerHomeView: View {
+    @State private var isShowingBarcodeClaim = false
+    @State private var isShowingScanner = false
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -67,6 +70,22 @@ private struct OwnerHomeView: View {
             }
             .background(Color(hex: "FFF9FB"))
             .navigationTitle("Home")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button("Scan Barcode") { isShowingScanner = true }
+                        Button("Enter Code Manually") { isShowingBarcodeClaim = true }
+                    } label: {
+                        Image(systemName: "barcode.viewfinder")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingBarcodeClaim) {
+            NavigationStack { BarcodeClaimView() }
+        }
+        .sheet(isPresented: $isShowingScanner) {
+            NavigationStack { PetScanPlaceholderView() }
         }
     }
 
@@ -179,7 +198,11 @@ private struct OwnerHomeView: View {
 
     private var quickHubCard: some View {
         cuteCard("Quick Actions", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-            cuteActionRow(icon: "📱", title: "Register via Barcode", subtitle: "Scan physical tag", showChevron: true)
+            Button {
+                isShowingBarcodeClaim = true
+            } label: {
+                cuteActionRow(icon: "📱", title: "Register via Barcode", subtitle: "Scan or enter code", showChevron: true)
+            }
             Divider().padding(.leading, 50)
             cuteActionRow(icon: "📋", title: "Issue Health QR", subtitle: "Share vaccine proof", showChevron: true)
             Divider().padding(.leading, 50)
@@ -205,6 +228,9 @@ private struct OwnerHomeView: View {
 }
 
 private struct OwnerPetsView: View {
+    @State private var showScanner = false
+    @State private var showManual = false
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -219,7 +245,10 @@ private struct OwnerPetsView: View {
             .navigationTitle("My Pets")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
+                    Menu {
+                        Button("Scan Barcode") { showScanner = true }
+                        Button("Enter Code Manually") { showManual = true }
+                        Button("Add Without Code") { }
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "plus.circle.fill")
@@ -241,6 +270,12 @@ private struct OwnerPetsView: View {
                     }
                 }
             }
+        }
+        .sheet(isPresented: $showScanner) {
+            NavigationStack { PetScanPlaceholderView() }
+        }
+        .sheet(isPresented: $showManual) {
+            NavigationStack { BarcodeClaimView() }
         }
     }
 

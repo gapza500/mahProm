@@ -1,9 +1,23 @@
 import SwiftUI
+import PetReadyShared
+
+final class AdminDependencies {
+    static let shared = AdminDependencies()
+    let petListViewModel: PetListViewModel
+
+    private init() {
+        let repository = PetRepositoryFactory.makeRepository()
+        let service = PetService(repository: repository)
+        petListViewModel = PetListViewModel(service: service)
+    }
+}
 
 struct ContentView: View {
+    @StateObject private var petListViewModel = AdminDependencies.shared.petListViewModel
+
     var body: some View {
         TabView {
-            AdminDashboardView()
+            AdminDashboardView(viewModel: petListViewModel)
                 .tabItem { Label("Dashboard", systemImage: "house.fill") }
             ApprovalsView()
                 .tabItem { Label("Approvals", systemImage: "checkmark.circle.fill") }
@@ -19,6 +33,10 @@ struct ContentView: View {
 }
 
 private struct AdminDashboardView: View {
+    @ObservedObject var viewModel: PetListViewModel
+    @State private var didTriggerInitialLoad = false
+    @State private var isLoading = true
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -39,8 +57,15 @@ private struct AdminDashboardView: View {
                         Divider().padding(.leading, 50)
                         cuteRow(icon: "📅", title: "Scheduled messages", subtitle: "2 announcements tomorrow", badge: "2", badgeColor: Color(hex: "A0D8F1"))
                     }
+                    
+                    recentPetRegistrations
                 }
                 .padding()
+            }
+            .refreshable {
+                isLoading = true
+                await viewModel.loadPets()
+                isLoading = false
             }
             .background(Color(hex: "FFF9FB"))
             .navigationTitle("Pet Care Central")
@@ -67,6 +92,12 @@ private struct AdminDashboardView: View {
                         .shadow(color: Color(hex: "FF9ECD").opacity(0.3), radius: 8, y: 4)
                     }
                 }
+            }
+            .task {
+                guard !didTriggerInitialLoad else { return }
+                didTriggerInitialLoad = true
+                await viewModel.loadPets()
+                isLoading = false
             }
         }
     }
@@ -186,6 +217,32 @@ private struct AdminDashboardView: View {
                 .stroke(colors[0].opacity(0.2), lineWidth: 2)
         )
         .shadow(color: colors[0].opacity(0.15), radius: 12, y: 6)
+    }
+
+    private var recentPetRegistrations: some View {
+        cuteCard("🐾 Recent Pet Registrations", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
+            if isLoading {
+                VStack(spacing: 8) {
+                    ProgressView().tint(Color(hex: "FF9ECD"))
+                    Text("Fetching the latest pets…")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            } else if viewModel.pets.isEmpty {
+                VStack(spacing: 8) {
+                    Text("🐶")
+                        .font(.largeTitle)
+                    Text("No new registrations yet")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            } else {
+                PetRegistrationsTable(pets: viewModel.pets)
+                    .padding(.top, 4)
+            }
+        }
     }
 }
 
@@ -447,6 +504,81 @@ private func cuteRow(icon: String, title: String, subtitle: String, badge: Strin
     .padding(.vertical, 6)
 }
 
+private struct PetRegistrationsTable: View {
+    let pets: [Pet]
+
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+    var body: some View {
+        VStack(spacing: 0) {
+            headerRow
+            Divider()
+            ForEach(recentPets.prefix(8)) { pet in
+                row(for: pet)
+                Divider()
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 18)
+                .fill(Color.white.opacity(0.7))
+        )
+    }
+
+    private var recentPets: [Pet] {
+        pets.sorted { $0.updatedAt > $1.updatedAt }
+    }
+
+    private var headerRow: some View {
+        HStack {
+            Text("Pet").font(.caption).foregroundStyle(.secondary)
+            Spacer()
+            Text("Owner").font(.caption).foregroundStyle(.secondary)
+                .frame(width: 90, alignment: .leading)
+            Text("Species").font(.caption).foregroundStyle(.secondary)
+                .frame(width: 70, alignment: .leading)
+            Text("Status").font(.caption).foregroundStyle(.secondary)
+                .frame(width: 70, alignment: .leading)
+            Text("Last Update").font(.caption).foregroundStyle(.secondary)
+                .frame(width: 120, alignment: .leading)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+    }
+
+    private func row(for pet: Pet) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(pet.name).font(.subheadline).bold()
+                if let barcode = pet.barcodeId, !barcode.isEmpty {
+                    Text("Barcode \(barcode)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            Text(pet.ownerId.uuidString.prefix(6) + "…")
+                .font(.caption)
+                .frame(width: 90, alignment: .leading)
+            Text(pet.species.rawValue.capitalized)
+                .font(.caption)
+                .frame(width: 70, alignment: .leading)
+            Text(pet.status.capitalized)
+                .font(.caption)
+                .frame(width: 70, alignment: .leading)
+            Text(Self.dateFormatter.string(from: pet.updatedAt))
+                .font(.caption)
+                .frame(width: 120, alignment: .leading)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+}
+
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -477,4 +609,3 @@ extension Color {
 #Preview {
     ContentView()
 }
-

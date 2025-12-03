@@ -96,6 +96,7 @@ We'll develop this as a comprehensive 4-app ecosystem with realistic integration
 - **Government Services**: Public announcements, emergency alerts, professional licensing verification
 - **Cloud Integration**: Real cloud database with cross-app synchronization and offline support
 - **Smart Transport**: GPS-optimized routing, multiple pickup coordination, ETA calculation
+- **Live Admin Feed**: Central Admin dashboard displays the latest pet registrations in a Firestore-backed data table so ops can verify successful owner submissions instantly.
 
 ### Technical Capabilities:
 - **Barcode/QR System**: Mock microchip simulation with government verification capabilities
@@ -108,6 +109,7 @@ We'll develop this as a comprehensive 4-app ecosystem with realistic integration
 - 📄 **Comprehensive documentation** for all 4 apps with architecture diagrams and API specifications
 - 🧪 **Cross-app integration tests** for real-time synchronization and emergency scenarios
 - 🎯 **Government service reliability testing** for announcements and emergency response
+- 🧭 **Barcode testing helper (debug builds)**: Any 4+ character barcode input is accepted for fast manual QA; production still expects the full `PET-<SPECIES>-####-######-AA` pattern and checksum.
 - 📱 **Accessibility testing** (VoiceOver, Dynamic Type) and **localization** (TH/EN) across all apps
 - 🚀 **Deployment guides** for App Store submission and backend service configuration
 
