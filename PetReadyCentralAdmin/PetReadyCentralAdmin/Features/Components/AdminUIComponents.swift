@@ -89,14 +89,18 @@ struct PetRegistrationsTable: View {
     }()
 
     var body: some View {
-        VStack(spacing: 0) {
-            headerRow
-            Divider()
-            ForEach(recentPets.prefix(8)) { pet in
-                row(for: pet)
+        ScrollView(.horizontal, showsIndicators: false) {
+            VStack(spacing: 0) {
+                headerRow
                 Divider()
+                ForEach(recentPets.prefix(8)) { pet in
+                    row(for: pet)
+                    Divider()
+                }
             }
+            .frame(minWidth: 520, alignment: .leading)
         }
+        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 18)
                 .fill(Color.white.opacity(0.7))
@@ -108,43 +112,53 @@ struct PetRegistrationsTable: View {
     }
 
     private var headerRow: some View {
-        HStack {
-            Text("Pet").font(.caption).foregroundStyle(.secondary)
+        HStack(spacing: 12) {
+            Text("Pet")
             Spacer()
-            Text("Owner").font(.caption).foregroundStyle(.secondary).frame(width: 90, alignment: .leading)
-            Text("Species").font(.caption).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
-            Text("Status").font(.caption).foregroundStyle(.secondary).frame(width: 70, alignment: .leading)
-            Text("Last Update").font(.caption).foregroundStyle(.secondary).frame(width: 120, alignment: .leading)
+            Text("Owner").frame(width: 100, alignment: .leading)
+            Text("Species").frame(width: 80, alignment: .leading)
+            Text("Status").frame(width: 80, alignment: .leading)
+            Text("Last Update").frame(width: 140, alignment: .leading)
         }
-        .padding(.horizontal, 16)
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 4)
         .padding(.vertical, 12)
     }
 
     private func row(for pet: Pet) -> some View {
-        HStack(alignment: .top, spacing: 8) {
+        HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(pet.name).font(.subheadline).bold()
+                Text(pet.name)
+                    .font(.subheadline)
+                    .bold()
+                    .lineLimit(1)
                 if let barcode = pet.barcodeId, !barcode.isEmpty {
                     Text("Barcode \(barcode)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
             }
             Spacer()
             Text(pet.ownerId.uuidString.prefix(6) + "…")
                 .font(.caption)
-                .frame(width: 90, alignment: .leading)
+                .frame(width: 100, alignment: .leading)
+                .lineLimit(1)
             Text(pet.species.rawValue.capitalized)
                 .font(.caption)
-                .frame(width: 70, alignment: .leading)
+                .frame(width: 80, alignment: .leading)
+                .lineLimit(1)
             Text(pet.status.capitalized)
                 .font(.caption)
-                .frame(width: 70, alignment: .leading)
+                .frame(width: 80, alignment: .leading)
+                .lineLimit(1)
             Text(Self.dateFormatter.string(from: pet.updatedAt))
                 .font(.caption)
-                .frame(width: 120, alignment: .leading)
+                .frame(width: 140, alignment: .leading)
+                .lineLimit(1)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 4)
         .padding(.vertical, 10)
     }
 }
