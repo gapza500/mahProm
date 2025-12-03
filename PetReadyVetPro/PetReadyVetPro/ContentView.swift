@@ -1,5 +1,6 @@
 import SwiftUI
 
+
 struct ContentView: View {
     var body: some View {
         TabView {
@@ -14,88 +15,174 @@ struct ContentView: View {
             VetSettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
+        .tint(Color(hex: "FF9ECD"))
     }
 }
 
+
 private struct VetDashboard: View {
     var body: some View {
-        ScrollView {
-            VStack(spacing: 18) {
-                dashboardHero(title: "You’re on a 4.2⭐ response streak", subtitle: "Keep replies under 5 min for verified badge")
-                metricRow(items: [
-                    ("calendar", "Today", "11 sessions"),
-                    ("bolt.fill", "Queue", "3 waiting"),
-                    ("star.fill", "Rating", "4.9")
-                ])
-                cardSection(title: "Consultation Queue") {
-                    ForEach(0..<3, id: \.self) { idx in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("Owner #\(idx + 241)")
-                                    .font(.headline)
-                                Text("Fluffy – itchy skin")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Button("Join") {}
-                                .buttonStyle(.borderedProminent)
-                        }.padding(.vertical, 4)
-                    }
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    vetHeroCard
+                    metricGrid
+                    queueCard
+                    quickActionsCard
                 }
-                cardSection(title: "Quick Actions") {
-                    actionRow(icon: "message.fill", title: "Tele-chat room", detail: "Reply instantly")
-                    actionRow(icon: "pills.fill", title: "Send prescription", detail: "Upload photo or PDF")
-                    actionRow(icon: "video.fill", title: "Video handoff", detail: "Escalate to voice/video")
-                }
+                .padding()
             }
-            .padding()
+            .background(Color(hex: "FFF9FB"))
+            .navigationTitle("Dashboard")
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+    }
+
+    // Hero Banner
+    private var vetHeroCard: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Good Morning, Dr. Siri! 👩‍⚕️")
+                    .font(.title2.bold())
+                    .foregroundStyle(.white)
+                
+                Text("You’re on a 4.2⭐ response streak")
+                    .font(.subheadline)
+                    .foregroundStyle(.white.opacity(0.95))
+                
+                HStack(spacing: 8) {
+                    Label("Verified", systemImage: "checkmark.seal.fill")
+                    Text("•")
+                    Text("Reply < 5 min")
+                }
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.white.opacity(0.85))
+                .padding(.top, 4)
+            }
+            Spacer()
+        }
+        .padding(24)
+        .background(
+            ZStack {
+                LinearGradient(
+                    colors: [Color(hex: "A0D8F1"), Color(hex: "FFB5D8")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                Circle()
+                    .fill(.white.opacity(0.2))
+                    .frame(width: 150, height: 150)
+                    .offset(x: 100, y: -40)
+                    .blur(radius: 30)
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28))
+        .shadow(color: Color(hex: "A0D8F1").opacity(0.4), radius: 16, y: 8)
+    }
+
+    // Metrics (Today, Queue, Rating)
+    private var metricGrid: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 14) {
+            cuteStatusTile(icon: "🗓️", title: "Today", subtitle: "11", colors: [Color(hex: "FFB5D8"), Color(hex: "FFD4E8")])
+            cuteStatusTile(icon: "⚡️", title: "Queue", subtitle: "3", colors: [Color(hex: "A0D8F1"), Color(hex: "D4EDFF")])
+            cuteStatusTile(icon: "⭐️", title: "Rating", subtitle: "4.9", colors: [Color(hex: "FFE5A0"), Color(hex: "FFF3D4")])
+        }
+    }
+
+    
+    private var queueCard: some View {
+        cuteCard("Consultation Queue", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+            ForEach(0..<3, id: \.self) { idx in
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Owner #\(idx + 241)")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("Fluffy – Itchy skin")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Join") {}
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Color(hex: "FF9ECD"), in: Capsule())
+                        .shadow(color: Color(hex: "FF9ECD").opacity(0.3), radius: 4, y: 2)
+                }
+                .padding(.vertical, 6)
+                if idx < 2 { Divider() }
+            }
+        }
+    }
+
+    
+    private var quickActionsCard: some View {
+        cuteCard("Quick Actions", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
+            cuteActionRow(icon: "💬", title: "Tele-chat room", subtitle: "Reply instantly", showChevron: true)
+            Divider().padding(.leading, 50)
+            cuteActionRow(icon: "💊", title: "Prescription", subtitle: "Send PDF/Photo", showChevron: true)
+            Divider().padding(.leading, 50)
+            cuteActionRow(icon: "📹", title: "Video Handoff", subtitle: "Switch to video", badge: "Pro", badgeColor: Color(hex: "98D8AA"), showChevron: true)
+        }
     }
 }
+
 
 private struct PatientsView: View {
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(0..<6, id: \.self) { idx in
-                    NavigationLink(destination: Text("Patient detail placeholder")) {
-                        VStack(alignment: .leading) {
-                            Text("Pet \(idx + 1)").font(.headline)
-                            Text("Owner Mint • Latest visit 2w ago")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(0..<6, id: \.self) { idx in
+                        cuteCard("", gradient: [Color.white, Color.white]) {
+                            HStack(spacing: 16) {
+                                Text("🐶")
+                                    .font(.largeTitle)
+                                    .frame(width: 50, height: 50)
+                                    .background(Color(hex: "FFF0F5"), in: Circle())
+                                VStack(alignment: .leading) {
+                                    Text("Bubbles")
+                                        .font(.headline)
+                                    Text("Owner Mint • 2w ago")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right").foregroundStyle(.tertiary)
+                            }
                         }
                     }
                 }
+                .padding()
             }
+            .background(Color(hex: "FFF9FB"))
             .navigationTitle("Patients")
         }
     }
 }
 
+
 private struct QueueView: View {
     var body: some View {
         NavigationStack {
-            List {
-                Section("Waiting") {
-                    ForEach(0..<3, id: \.self) { idx in
-                        VStack(alignment: .leading) {
-                            Text("Owner #\(idx + 312)")
-                                .font(.headline)
-                            Text("Waiting 3m • Auto escalate 12m")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+            ScrollView {
+                VStack(spacing: 18) {
+                    cuteCard("Waiting", gradient: [Color(hex: "FFE5A0").opacity(0.2), Color.white]) {
+                        ForEach(0..<3, id: \.self) { idx in
+                            cuteInfoRow(icon: "⏳", title: "Owner #\(idx + 312)", subtitle: "Waiting 3m • Auto-escalate in 12m")
+                            if idx < 2 { Divider().padding(.leading, 50) }
+                        }
+                    }
+                    cuteCard("Completed", gradient: [Color(hex: "98D8AA").opacity(0.2), Color.white]) {
+                        ForEach(0..<2, id: \.self) { idx in
+                            cuteInfoRow(icon: "✅", title: "Case #\(idx + 123)", subtitle: "Resolved successfully")
                         }
                     }
                 }
-                Section("Completed") {
-                    ForEach(0..<2, id: \.self) { idx in
-                        Label("Case \(idx + 123) resolved", systemImage: "checkmark.circle.fill")
-                    }
-                }
+                .padding()
             }
+            .background(Color(hex: "FFF9FB"))
             .navigationTitle("Queue")
         }
     }
@@ -104,113 +191,158 @@ private struct QueueView: View {
 private struct ContentHubView: View {
     var body: some View {
         NavigationStack {
-            List {
-                Section("Campaigns") {
-                    NavigationLink("Wellness Week Promo", destination: Text("Campaign builder"))
-                    NavigationLink("Vaccination Drive", destination: Text("Campaign analytics"))
+            ScrollView {
+                VStack(spacing: 18) {
+                    cuteCard("Campaigns", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                        cuteActionRow(icon: "🎉", title: "Wellness Promo", subtitle: "Edit builder", showChevron: true)
+                        Divider().padding(.leading, 50)
+                        cuteActionRow(icon: "💉", title: "Vaccine Drive", subtitle: "View analytics", showChevron: true)
+                    }
                 }
-                Section("Education") {
-                    Label("Upload article", systemImage: "square.and.pencil")
-                    Label("View drafts", systemImage: "doc.richtext")
-                }
+                .padding()
             }
+            .background(Color(hex: "FFF9FB"))
             .navigationTitle("Content Hub")
         }
     }
 }
 
+
 private struct VetSettingsView: View {
     var body: some View {
         NavigationStack {
-            List {
-                NavigationLink("Profile", destination: Text("Edit profile"))
-                NavigationLink("Availability", destination: Text("Schedule"))
-                NavigationLink("Pricing", destination: Text("Consultation fees"))
+            ScrollView {
+                VStack(spacing: 18) {
+                    cuteCard("Doctor Profile", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
+                        cuteInfoRow(icon: "👩‍⚕️", title: "Dr. Siri", subtitle: "Edit details", showChevron: true)
+                    }
+                    cuteCard("Practice", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
+                        cuteActionRow(icon: "📅", title: "Availability", subtitle: "Manage schedule", showChevron: true)
+                        Divider().padding(.leading, 50)
+                        cuteActionRow(icon: "🏷️", title: "Pricing", subtitle: "Consultation fees", showChevron: true)
+                    }
+                }
+                .padding()
             }
+            .background(Color(hex: "FFF9FB"))
             .navigationTitle("Settings")
         }
     }
 }
 
-private func dashboardHero(title: String, subtitle: String) -> some View {
-    VStack(alignment: .leading, spacing: 10) {
-        Text(title)
-            .font(.headline)
-            .foregroundStyle(.white)
+
+
+private func cuteStatusTile(icon: String, title: String, subtitle: String, colors: [Color]) -> some View {
+    VStack(spacing: 10) {
+        Text(icon).font(.system(size: 28))
         Text(subtitle)
-            .font(.subheadline)
-            .foregroundStyle(.white.opacity(0.85))
-    }
-    .padding()
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(
-        LinearGradient(colors: [.indigo, .blue], startPoint: .topLeading, endPoint: .bottomTrailing),
-        in: RoundedRectangle(cornerRadius: 22)
-    )
-}
-
-private func metricRow(items: [(String, String, String)]) -> some View {
-    HStack(spacing: 12) {
-        ForEach(items, id: \.0) { item in
-            VStack(alignment: .leading, spacing: 6) {
-                Image(systemName: item.0)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(item.1)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(item.2)
-                    .font(.headline)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding()
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.04), radius: 4, y: 2)
-        }
-    }
-}
-
-private func cardSection<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
-    VStack(alignment: .leading, spacing: 12) {
+            .font(.title3.bold())
+            .foregroundStyle(LinearGradient(colors: colors.map { $0.opacity(0.8) }, startPoint: .topLeading, endPoint: .bottomTrailing))
         Text(title)
-            .font(.headline)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 18)
+    .background(
+        ZStack {
+            RoundedRectangle(cornerRadius: 22).fill(.white)
+            RoundedRectangle(cornerRadius: 22).fill(LinearGradient(colors: colors.map { $0.opacity(0.2) }, startPoint: .topLeading, endPoint: .bottomTrailing))
+        }
+    )
+    .overlay(RoundedRectangle(cornerRadius: 22).stroke(colors[0].opacity(0.2), lineWidth: 2))
+    .shadow(color: colors[0].opacity(0.15), radius: 12, y: 6)
+}
+
+private func cuteCard<Content: View>(_ title: String, gradient: [Color], @ViewBuilder content: () -> Content) -> some View {
+    VStack(alignment: .leading, spacing: 18) {
+        if !title.isEmpty {
+            Text(title).font(.title3.bold()).foregroundStyle(.primary)
+        }
         content()
     }
-    .padding()
-    .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
-    .shadow(color: .black.opacity(0.05), radius: 6, y: 3)
+    .padding(22)
+    .background(
+        ZStack {
+            RoundedRectangle(cornerRadius: 28).fill(.white)
+            RoundedRectangle(cornerRadius: 28).fill(LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+        }
+    )
+    .overlay(RoundedRectangle(cornerRadius: 28).stroke(gradient[0].opacity(0.3), lineWidth: 2))
+    .shadow(color: gradient[0].opacity(0.15), radius: 16, y: 8)
 }
 
-private func actionRow(icon: String, title: String, detail: String) -> some View {
-    HStack {
-        Image(systemName: icon)
-            .foregroundStyle(.white)
-            .padding()
-            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
-        VStack(alignment: .leading) {
-            Text(title).bold()
-            Text(detail).font(.caption).foregroundStyle(.secondary)
+
+private func cuteActionRow(icon: String, title: String, subtitle: String, badge: String? = nil, badgeColor: Color? = nil, showChevron: Bool = false) -> some View {
+    HStack(spacing: 14) {
+        Text(icon)
+            .font(.system(size: 28))
+            .frame(width: 44, height: 44)
+            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(.primary)
+            Text(subtitle).font(.caption).foregroundStyle(.secondary)
         }
         Spacer()
+        if let badge = badge, let badgeColor = badgeColor {
+            Text(badge)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(badgeColor, in: Capsule())
+                .shadow(color: badgeColor.opacity(0.3), radius: 4, y: 2)
+        }
+        if showChevron {
+            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(.tertiary)
+        }
+    }
+    .padding(.vertical, 6)
+}
+
+
+private func cuteInfoRow(icon: String, title: String, subtitle: String, badge: String? = nil, badgeColor: Color? = nil, showChevron: Bool = false) -> some View {
+    HStack(spacing: 14) {
+        Text(icon)
+            .font(.system(size: 24))
+            .frame(width: 40, height: 40)
+            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(.primary)
+            Text(subtitle).font(.caption).foregroundStyle(.secondary)
+        }
+        Spacer()
+        if let badge = badge, let badgeColor = badgeColor {
+            Text(badge)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10).padding(.vertical, 5)
+                .background(badgeColor, in: Capsule())
+        }
+        if showChevron {
+            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(.tertiary)
+        }
     }
     .padding(.vertical, 4)
 }
 
-private func rowWithChevron(title: String, subtitle: String) -> some View {
-    HStack {
-        VStack(alignment: .leading) {
-            Text(title).bold()
-            Text(subtitle)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default: (a, r, g, b) = (1, 1, 1, 0)
         }
-        Spacer()
-        Image(systemName: "chevron.right")
-            .foregroundStyle(.tertiary)
+        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue:  Double(b) / 255, opacity: Double(a) / 255)
     }
-    .padding(.vertical, 6)
 }
 
 #Preview {
     ContentView()
 }
+
