@@ -16,6 +16,7 @@
 | Integration Tests | ✅ | Added `IntegrationTestHelpers` in SharedCode tests (placeholder cross-app harness). |
 | Firebase Bootstrap | ✅ | Added `AppBootstrap.configureFirebaseIfNeeded()` and wired each app to call `FirebaseApp.configure()` on launch. |
 | CloudKit Toggle | ✅ | CentralAdmin now skips CloudKit unless `ENABLE_CLOUDKIT=1` is set (avoids entitlement errors when using Firebase-only setup). |
+| Dark Appearance Plan | ⏳ | TBD: document how each app will ensure dark-mode parity (colors, assets, testing checklist). |
 
 ## Technical Validation Snapshot
 

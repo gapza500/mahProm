@@ -205,6 +205,13 @@ _TL;DR_: seed the profile doc + claim, use the new login UI per app, approve fro
 
 ---
 
+## Dark Appearance Support (upcoming)
+- **Design parity**: All color tokens and gradients will be defined in SharedCode so both light/dark modes stay in sync.
+- **Testing**: Each app will get a “Dark Mode QA” checklist before release (UI previews + simulator snapshots).
+- **Docs**: The plan lives in `Documentation/Development/PHASE1_STATUS.md` (see “Dark Appearance Plan” row) and will expand as Phase 2 kicks off.
+
+---
+
 ## Multi-App Folder Structure
 
 ```
