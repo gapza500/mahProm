@@ -49,6 +49,13 @@ public final class AuthService: ObservableObject, AuthServiceProtocol {
             return
         }
 
+#if canImport(GoogleSignIn)
+        if GIDSignIn.sharedInstance.configuration == nil,
+           let clientID = FirebaseApp.app()?.options.clientID {
+            GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+        }
+#endif
+
         authListenerHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             Task { await self?.handleAuthChange(user: user) }
         }
