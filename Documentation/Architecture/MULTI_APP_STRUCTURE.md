@@ -8,15 +8,15 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyOwnerApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Home/
-│   │   ├── Pets/
-│   │   ├── Health/
-│   │   ├── Clinics/
-│   │   ├── Chat/
-│   │   ├── Info/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/         # Owner login/signup flow
+│   │   ├── Home/         # Welcome hero + quick actions
+│   │   ├── Pets/         # Pet list/detail placeholders
+│   │   ├── Health/       # Vaccine/care timeline
+│   │   ├── Clinics/      # Clinic discovery + filters
+│   │   ├── Chat/         # Owner chat shells
+│   │   ├── Info/         # Announcements + education
+│   │   ├── Settings/     # Preferences + infra preview
+│   │   └── Components/   # Shared owner UI helpers
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -24,13 +24,13 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyVetProApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Patients/
-│   │   ├── Queue/
-│   │   ├── Content/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/         # Vet/clinic application + login
+│   │   ├── Dashboard/    # Professional overview
+│   │   ├── Patients/     # Patient list cards
+│   │   ├── Queue/        # Queue monitor mock
+│   │   ├── Content/      # Educational content hub
+│   │   ├── Settings/     # Practice + pricing forms
+│   │   └── Components/   # Vet UI helpers
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -38,12 +38,12 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyRiderApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Jobs/
-│   │   ├── Wallet/
-│   │   ├── Profile/
-│   │   └── Components/
+│   │   ├── Auth/         # Rider login/request access
+│   │   ├── Dashboard/    # Rider hero + stats
+│   │   ├── Jobs/         # Job list/filter UI
+│   │   ├── Wallet/       # Money pocket preview
+│   │   ├── Profile/      # Documents, vehicles, settings
+│   │   └── Components/   # Rider UI helpers
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -51,13 +51,13 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyCentralAdminApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Approvals/
-│   │   ├── Announcements/
-│   │   ├── Analytics/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/         # Admin login/request
+│   │   ├── Dashboard/    # System overview
+│   │   ├── Approvals/    # Firestore approvals queue
+│   │   ├── Announcements/# Alert composer
+│   │   ├── Analytics/    # Metrics cards
+│   │   ├── Settings/     # Feature toggles + infra
+│   │   └── Components/   # Admin UI helpers
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/

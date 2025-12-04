@@ -255,15 +255,15 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyOwnerApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Home/
-│   │   ├── Pets/
-│   │   ├── Health/
-│   │   ├── Clinics/
-│   │   ├── Chat/
-│   │   ├── Info/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/           # Owner auth screens
+│   │   ├── Home/           # Dashboard cards + SOS quick actions
+│   │   ├── Pets/           # Pet list/detail placeholders
+│   │   ├── Health/         # Health timeline shells
+│   │   ├── Clinics/        # Clinic discovery + filters
+│   │   ├── Chat/           # Owner chat history samples
+│   │   ├── Info/           # Government alerts + education
+│   │   ├── Settings/       # Preferences, infrastructure preview
+│   │   └── Components/     # Cute cards/rows shared in owner app
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -271,13 +271,13 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyVetProApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Patients/
-│   │   ├── Queue/
-│   │   ├── Content/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/           # Vet/cliniс access + apply flow
+│   │   ├── Dashboard/      # Vet hub hero/metrics
+│   │   ├── Patients/       # Patient list placeholders
+│   │   ├── Queue/          # Live queue monitor mock
+│   │   ├── Content/        # Content hub cards
+│   │   ├── Settings/       # Practice profile, pricing, etc.
+│   │   └── Components/     # Reusable vet cards/rows
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -285,12 +285,12 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyRiderApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Jobs/
-│   │   ├── Wallet/
-│   │   ├── Profile/
-│   │   └── Components/
+│   │   ├── Auth/           # Rider login/request
+│   │   ├── Dashboard/      # Mission hero + stats
+│   │   ├── Jobs/           # Jobs list + filters
+│   │   ├── Wallet/         # Money pocket preview
+│   │   ├── Profile/        # Docs, vehicle, service areas
+│   │   └── Components/     # Shared rider UI helpers
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
@@ -298,13 +298,13 @@ PetReady-Ecosystem/
 │   ├── App/
 │   │   └── PetReadyCentralAdminApp.swift
 │   ├── Features/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Approvals/
-│   │   ├── Announcements/
-│   │   ├── Analytics/
-│   │   ├── Settings/
-│   │   └── Components/
+│   │   ├── Auth/           # Admin login/request access
+│   │   ├── Dashboard/      # System overview tiles
+│   │   ├── Approvals/      # Firestore approval queue
+│   │   ├── Announcements/  # Alert broadcast shell
+│   │   ├── Analytics/      # Metrics mockups
+│   │   ├── Settings/       # Feature toggles + infra link
+│   │   └── Components/     # Reusable admin cards/rows
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
