@@ -369,15 +369,16 @@ PetReady-Ecosystem/
 ---
 
 ## Next Steps
-- Use `petready_spec.md` to drive code‑generation and project scaffolding.
-- Set CI (Fastlane) and TestFlight builds for quick feedback.
-- Integrate a real backend when ready (swap APIClient mocks).
+1. **Dark appearance rollout** — Finish the plan called out in `Documentation/Development/PHASE1_STATUS.md`, migrate remaining custom colors to `DesignSystem`, and verify every app in dark mode.
+2. **Infrastructure wiring** — Replace the mock GPS/realtime/push stubs with live services (Firebase, sockets, APNs) so `InfrastructurePreviewView` reflects real data.
+3. **CI + builds** — Bring up Fastlane/TestFlight for the four targets so QA can install Phase 1 builds without Xcode.
 
 ## Documentation Map
-- Full index: [`Documentation/README.md`](Documentation/README.md)
-- Specs & rules now live under `Documentation/Specs` and `Documentation/Guidelines`.
-- See [`navigation_plan.md`](Documentation/Specs/navigation_plan.md) for tab structures per app.
-- Dev setup/roadmaps live in `Documentation/Development`.
+- **Root index**: [`Documentation/README.md`](Documentation/README.md) summarizes every doc set.
+- **Architecture**: [`Documentation/Architecture/MULTI_APP_STRUCTURE.md`](Documentation/Architecture/MULTI_APP_STRUCTURE.md) (folder tree) + other architecture notes.
+- **Specs & rules**: `Documentation/Specs/*.md`, `Documentation/Guidelines/*.md`.
+- **Navigation plan**: [`Documentation/Specs/navigation_plan.md`](Documentation/Specs/navigation_plan.md).
+- **Development guides**: `Documentation/Development/` (setup, phase plans, CloudKit/Firebase notes).
 
 ---
 
