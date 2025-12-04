@@ -29,7 +29,7 @@ struct AdminDashboardScreen: View {
                 .padding()
             }
             .refreshable { await reload() }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Pet Care Central")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct ContentHubView: View {
     var body: some View {
@@ -18,7 +19,7 @@ struct ContentHubView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Content Hub")
         }
     }

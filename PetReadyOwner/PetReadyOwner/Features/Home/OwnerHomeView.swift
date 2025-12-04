@@ -17,7 +17,7 @@ struct OwnerHomeView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Home")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -153,9 +153,44 @@ struct OwnerHomeView: View {
                 cuteActionRow(icon: "📱", title: "Register via Barcode", subtitle: "Scan or enter code", showChevron: true)
             }
             Divider().padding(.leading, 50)
-            cuteActionRow(icon: "📋", title: "Issue Health QR", subtitle: "Share vaccine proof", showChevron: true)
+            NavigationLink {
+                FeaturePlaceholderView(
+                    title: "Health QR Pass",
+                    message: "A digital card that pulls vaccination records from Firestore so owners can share proof instantly.",
+                    icon: "🪪",
+                    highlights: [
+                        "One-tap QR for check-ins at clinics",
+                        "Expirable links for boarding / grooming partners"
+                    ]
+                )
+                .navigationTitle("Health QR")
+            } label: {
+                cuteActionRow(icon: "📋", title: "Issue Health QR", subtitle: "Share vaccine proof", showChevron: true)
+            }
+            .buttonStyle(.plain)
             Divider().padding(.leading, 50)
-            cuteActionRow(icon: "🆘", title: "Start SOS", subtitle: "Emergency dispatch", badge: "Emergency", badgeColor: Color(hex: "FF9ECD"), showChevron: true)
+            NavigationLink {
+                FeaturePlaceholderView(
+                    title: "SOS Dispatch",
+                    message: "Preview of the panic flow that alerts riders + nearby vets while sharing location snapshots.",
+                    icon: "🚨",
+                    highlights: [
+                        "Sends GPS & pet profile automatically",
+                        "Hands off to push + realtime channels"
+                    ]
+                )
+                .navigationTitle("SOS Preview")
+            } label: {
+                cuteActionRow(
+                    icon: "🆘",
+                    title: "Start SOS",
+                    subtitle: "Emergency dispatch",
+                    badge: "Emergency",
+                    badgeColor: Color(hex: "FF9ECD"),
+                    showChevron: true
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 

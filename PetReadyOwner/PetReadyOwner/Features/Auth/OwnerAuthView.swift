@@ -16,6 +16,8 @@ struct OwnerAuthView: View {
     @State private var confirmPassword: String = ""
     @State private var isSubmitting = false
     @State private var localError: String?
+    @State private var infoMessage: String?
+    @State private var showResetConfirmation = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -56,10 +58,23 @@ struct OwnerAuthView: View {
             }
 
             if let message = localError ?? authService.errorDescription {
-                Text(message)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
+                AuthFeedbackBanner(status: .error, message: message)
+            }
+            if let infoMessage {
+                AuthFeedbackBanner(status: .info, message: infoMessage)
+            }
+
+            if mode == .login {
+                Button("Forgot password?") {
+                    guard !email.isEmpty else {
+                        localError = "Enter your email first."
+                        return
+                    }
+                    showResetConfirmation = true
+                }
+                .font(.footnote.weight(.semibold))
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
 
             Button(action: submit) {
@@ -108,10 +123,19 @@ struct OwnerAuthView: View {
             .disabled(isSubmitting)
         }
         .padding()
+        .alert("Send password reset?", isPresented: $showResetConfirmation) {
+            Button("Send reset", role: .none) {
+                Task { await sendReset() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("We'll email reset instructions to \(email).")
+        }
     }
 
     private func submit() {
         localError = nil
+        infoMessage = nil
         guard !email.isEmpty, !password.isEmpty else {
             localError = "Please fill in all required fields."
             return
@@ -162,5 +186,21 @@ struct OwnerAuthView: View {
             }
             isSubmitting = false
         }
+    }
+
+    private func sendReset() async {
+        guard !email.isEmpty else {
+            localError = "Enter your email first."
+            return
+        }
+        isSubmitting = true
+        do {
+            try await authService.sendPasswordReset(email: email)
+            infoMessage = "Password reset email sent."
+            localError = nil
+        } catch {
+            localError = error.localizedDescription
+        }
+        isSubmitting = false
     }
 }

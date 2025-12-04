@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct OwnerChatView: View {
     var body: some View {
@@ -18,7 +19,7 @@ struct OwnerChatView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Chat")
         }
     }

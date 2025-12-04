@@ -7,6 +7,8 @@ public struct FirebaseEmailLoginView: View {
     @State private var password: String = ""
     @State private var isSubmitting = false
     @State private var errorMessage: String?
+    @State private var infoMessage: String?
+    @State private var showResetConfirmation = false
     @FocusState private var focusedField: Field?
 
     private enum Field {
@@ -44,11 +46,22 @@ public struct FirebaseEmailLoginView: View {
             }
 
             if let errorMessage {
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
+                AuthFeedbackBanner(status: .error, message: errorMessage)
             }
+            if let infoMessage {
+                AuthFeedbackBanner(status: .info, message: infoMessage)
+            }
+
+            Button("Forgot password?") {
+                guard !email.isEmpty else {
+                    errorMessage = "Enter your email to reset your password."
+                    return
+                }
+                showResetConfirmation = true
+            }
+            .font(.footnote.weight(.semibold))
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .trailing)
 
             Button(action: authenticate) {
                 HStack {
@@ -98,10 +111,17 @@ public struct FirebaseEmailLoginView: View {
             .disabled(isSubmitting)
         }
         .padding()
+        .alert("Send password reset?", isPresented: $showResetConfirmation) {
+            Button("Send reset", role: .none) { resetPassword() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("We'll email password reset instructions to \(email).")
+        }
     }
 
     private func authenticate() {
         errorMessage = nil
+        infoMessage = nil
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Both email and password are required."
             return
@@ -119,10 +139,30 @@ public struct FirebaseEmailLoginView: View {
 
     private func authenticateWithGoogle() {
         errorMessage = nil
+        infoMessage = nil
         isSubmitting = true
         Task { @MainActor in
             do {
                 try await authService.signInWithGoogle()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isSubmitting = false
+        }
+    }
+
+    private func resetPassword() {
+        errorMessage = nil
+        infoMessage = nil
+        guard !email.isEmpty else {
+            errorMessage = "Enter your email to reset your password."
+            return
+        }
+        isSubmitting = true
+        Task { @MainActor in
+            do {
+                try await authService.sendPasswordReset(email: email)
+                infoMessage = "Password reset email sent to \(email)."
             } catch {
                 errorMessage = error.localizedDescription
             }

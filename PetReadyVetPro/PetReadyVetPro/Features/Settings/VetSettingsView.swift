@@ -9,12 +9,54 @@ struct VetSettingsView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     vetCuteCard("Doctor Profile", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
-                        vetCuteInfoRow(icon: "👩‍⚕️", title: "Dr. Siri", subtitle: "Edit details", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Doctor Profile",
+                                message: "Form layout for vet credentials, clinics, and messaging preferences.",
+                                icon: "👩‍⚕️",
+                                highlights: ["License uploads", "Availability toggle"]
+                            )
+                            .navigationTitle("Doctor Profile")
+                        } label: {
+                            vetCuteInfoRow(icon: "👩‍⚕️", title: "Dr. Siri", subtitle: "Edit details", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     vetCuteCard("Practice", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
-                        vetCuteActionRow(icon: "📅", title: "Availability", subtitle: "Manage schedule", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Clinic Availability",
+                                message: "Scheduler referencing the shared realtime queue service.",
+                                icon: "📅",
+                                highlights: ["Block leave days", "Sync to owner booking"]
+                            )
+                            .navigationTitle("Availability")
+                        } label: {
+                            vetCuteActionRow(icon: "📅", title: "Availability", subtitle: "Manage schedule", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        vetCuteActionRow(icon: "🏷️", title: "Pricing", subtitle: "Consultation fees", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Pricing",
+                                message: "Tiered price list tied to clinics and service codes.",
+                                icon: "🏷️",
+                                highlights: ["Per-role visibility", "Seasonal promos"]
+                            )
+                            .navigationTitle("Pricing")
+                        } label: {
+                            vetCuteActionRow(icon: "🏷️", title: "Pricing", subtitle: "Consultation fees", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    vetCuteCard("Foundation", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                        NavigationLink {
+                            InfrastructurePreviewView()
+                        } label: {
+                            vetCuteActionRow(icon: "🛰️", title: "Base infrastructure", subtitle: "GPS • realtime • push", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     Button(action: signOut) {
                         HStack {
@@ -38,7 +80,7 @@ struct VetSettingsView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Settings")
         }
     }

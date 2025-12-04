@@ -27,7 +27,7 @@ struct AdminApprovalsScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("✅ Approvals")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct AdminAnalyticsScreen: View {
     var body: some View {
@@ -22,7 +23,7 @@ struct AdminAnalyticsScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("📊 Analytics")
         }
     }

@@ -10,12 +10,26 @@ struct OwnerPetsView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(0..<5, id: \.self) { index in
-                        petCard(name: "Fluffy \(index + 1)", type: "Dog", age: "\(index + 1) years old")
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Pet Profile",
+                                message: "Mock screen showing how full medical history, QR exports and GPS breadcrumbs will live for each pet.",
+                                icon: "🐾",
+                                highlights: [
+                                    "Vaccination + reminders timeline",
+                                    "Shareable health card & QR export"
+                                ]
+                            )
+                            .navigationTitle("Fluffy \(index + 1)")
+                        } label: {
+                            petCard(name: "Fluffy \(index + 1)", type: "Dog", age: "\(index + 1) years old")
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("My Pets")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

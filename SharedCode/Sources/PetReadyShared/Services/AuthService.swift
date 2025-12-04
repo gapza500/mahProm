@@ -25,6 +25,7 @@ public protocol AuthServiceProtocol: AnyObject {
     func signIn(email: String, password: String) async throws
     func signUp(email: String, password: String, displayName: String, role: UserType, status: UserApprovalStatus, phone: String?) async throws
     func signInWithGoogle() async throws
+    func sendPasswordReset(email: String) async throws
     func signOut() throws
     func refreshRole() async
 }
@@ -121,7 +122,7 @@ public final class AuthService: ObservableObject, AuthServiceProtocol {
     }
 
     public func signInWithGoogle() async throws {
-        #if canImport(GoogleSignIn)
+#if canImport(GoogleSignIn)
         guard let presenter = AuthService.presentingViewController() else {
             throw AuthError.missingPresenter
         }
@@ -142,7 +143,15 @@ public final class AuthService: ObservableObject, AuthServiceProtocol {
         }
         #else
         throw AuthError.providerUnavailable
-        #endif
+#endif
+    }
+
+    public func sendPasswordReset(email: String) async throws {
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedEmail.isEmpty else {
+            throw AuthError.invalidEmail
+        }
+        try await Auth.auth().sendPasswordReset(withEmail: trimmedEmail)
     }
 
     public func signOut() throws {
@@ -254,6 +263,7 @@ public final class AuthService: ObservableObject, AuthServiceProtocol {
         case missingPresenter
         case missingGoogleToken
         case providerUnavailable
+        case invalidEmail
 
         var errorDescription: String? {
             switch self {
@@ -263,6 +273,8 @@ public final class AuthService: ObservableObject, AuthServiceProtocol {
                 return "Google Sign-In did not return a valid token."
             case .providerUnavailable:
                 return "Google Sign-In is not available on this platform."
+            case .invalidEmail:
+                return "Please enter a valid email address."
             }
         }
     }
@@ -286,6 +298,7 @@ public final class AuthService: ObservableObject {
     public func signIn(email: String, password: String) async throws {}
     public func signUp(email: String, password: String, displayName: String, role: UserType, status: UserApprovalStatus, phone: String?) async throws {}
     public func signInWithGoogle() async throws {}
+    public func sendPasswordReset(email: String) async throws {}
     public func signOut() throws {}
     public func refreshRole() async {}
 }

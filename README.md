@@ -198,6 +198,44 @@ Each app now wires into a shared Firebase Auth + Firestore profile system:
 3. **Approvals**
    - Central Admin → “Approvals” tab lists Firestore users with `status = pending`. Approving flips the status (and you can set custom claims via script/Cloud Function).
    - RoleGate automatically refreshes pending accounts every 10 seconds, so the user sees the approval without reinstalling.
+
+### Phase 1 polish: auth UX + infrastructure scaffolding
+
+- **AuthFeedbackBanner + Forgot Password UX** — Shared feedback banner (`SharedCode/Sources/PetReadyShared/Views/Auth/AuthFeedbackBanner.swift`) unifies inline messaging across Owner/Rider/Vet/Admin login views, each now includes confirmation dialogs before dispatching password resets.
+- **InfrastructurePreviewView demo** — `SharedCode/Sources/PetReadyShared/Views/Infrastructure/InfrastructurePreviewView.swift` wires the mock `LocationService`, `RealtimeSyncService`, and `PushNotificationService` together so every app can show the GPS/Realtime/Push backbone status from its settings tab.
+- **Feature placeholders everywhere** — Added `FeaturePlaceholderView` plus new navigation links so every chevron row opens a full-screen explanation (clinic details, SOS dispatch, admin toggles, etc.).
+- **Filter & base screens** — Owner Clinics (`OwnerClinicFilterView`) and Rider Jobs (`RiderJobFilterView`) now expose lightweight filter sheets powered by the shared location stub, giving stakeholders a visual direction for future GPS and dispatch flows.
+- **Design System entry point** — `SharedCode/Sources/PetReadyShared/DesignSystem/DesignSystem.swift` centralizes our color tokens, gradients, and layout metrics (light & dark variants) so flipping the palette or refining contrast is a single edit that flows into every target.
+
+## Repository Snapshot (Phase 1)
+
+```
+PetReady-Ecosystem/
+├── Backend/                          # Node/Express API + Socket.IO hub
+├── Documentation/                    # Phase tracking, API notes, setup guides
+├── SharedCode/                       # Swift package consumed by every app
+│   └── Sources/PetReadyShared/
+│       ├── DesignSystem/             # Global colors/gradients/metrics
+│       ├── Models + Services         # AuthService, repositories, utilities
+│       ├── Views/                    # Shared SwiftUI surfaces (auth, placeholders)
+├── PetReadyOwner/                    # Owner iOS target (SwiftUI)
+├── PetReadyVetPro/                   # Vet/Clinic target
+├── PetReadyRider/                    # Rider/Transport target
+├── PetReadyCentralAdmin/             # Government/Admin target
+├── Scripts/                          # build/test/deploy helpers
+└── Tools/, Config/, Backend/, etc.   # Supporting infrastructure
+```
+
+Each Xcode project imports `PetReadyShared` via the workspace so that services, shared UI, and the design system stay in sync.
+
+## Current App Flow (Phase 1 State)
+
+- **Shared foundation**: `RoleGateView` guards every app with email/password + Google auth, Firestore profiles, and auto-refreshing approval gates. Pending users land on branded pending states that retry every 10 seconds.
+- **PetReady Owner**: TabView with Home → Pets → Health → Clinics → Chat → Info → Settings. Most rows push `FeaturePlaceholderView` screens so stakeholders can see where Health QR, SOS dispatch, filters, etc. will live. Settings exposes password reset, notifications, and the new Infrastructure Preview.
+- **PetReady Rider**: Dashboard/Jobs/Wallet/Profile tabs built with the same design tokens; Jobs now features filter sheets tied to the shared LocationService stub and placeholder job detail routes. Profile includes service settings + infrastructure preview entry.
+- **PetReady VetPro**: Dashboard/Patients/Queue/Content/Settings tabs with cute cards, patient placeholders, and links into pending Clinic features. Settings highlights doctor profile + practice management placeholders plus infrastructure preview.
+- **PetReady CentralAdmin**: Dashboard/Approvals/Announcements/Analytics/Settings, featuring Firestore-driven approvals and placeholder flows for feature toggles, coverage areas, and analytics. All informational rows navigate to placeholder detail screens so admins see the roadmap beats.
+- **Infrastructure Preview**: Accessible from settings/profile in every app; surfaces mock GPS route, realtime event stream, and push-permission simulator so we can verify the shared services layer visually.
 4. **Security rules**
    - See `Documentation/Guidelines/firestore_rules_dev.md` for a starting rule set and instructions on setting `roles` claims.
 

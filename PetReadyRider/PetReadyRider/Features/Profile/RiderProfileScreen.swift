@@ -9,14 +9,67 @@ struct RiderProfileScreen: View {
             ScrollView {
                 VStack(spacing: 18) {
                     riderCuteCard("Identity", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
-                        riderCuteJobRow(icon: "📄", title: "Documents", subtitle: "Upload & verify", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Rider Documents",
+                                message: "Placeholder for ID/passport upload bound to Firestore profile docs.",
+                                icon: "🪪",
+                                highlights: ["KYC checklist", "Status per document"]
+                            )
+                            .navigationTitle("Documents")
+                        } label: {
+                            riderCuteJobRow(icon: "📄", title: "Documents", subtitle: "Upload & verify", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        riderCuteJobRow(icon: "🏍️", title: "Vehicle profile", subtitle: "Details & license", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Vehicle Details",
+                                message: "Garage for license plate, insurance and inspection photos.",
+                                icon: "🏍️",
+                                highlights: ["Multiple vehicle slots", "Reminder for renewals"]
+                            )
+                            .navigationTitle("Vehicle Profile")
+                        } label: {
+                            riderCuteJobRow(icon: "🏍️", title: "Vehicle profile", subtitle: "Details & license", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     riderCuteCard("Service", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        riderCuteJobRow(icon: "🗺️", title: "Service areas", subtitle: "Coverage map", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Service Areas",
+                                message: "Map-driven settings to limit dispatch radius.",
+                                icon: "🗺️",
+                                highlights: ["Uses shared GPS stub", "Area opt-in/out"]
+                            )
+                            .navigationTitle("Service Areas")
+                        } label: {
+                            riderCuteJobRow(icon: "🗺️", title: "Service areas", subtitle: "Coverage map", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        riderCuteJobRow(icon: "🔔", title: "Notifications", subtitle: "Alert preferences", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Alert Preferences",
+                                message: "Pick which push/realtime topics the rider wants.",
+                                icon: "🔔",
+                                highlights: ["Quiet hours", "Job type subscriptions"]
+                            )
+                            .navigationTitle("Notifications")
+                        } label: {
+                            riderCuteJobRow(icon: "🔔", title: "Notifications", subtitle: "Alert preferences", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    riderCuteCard("Foundation", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
+                        NavigationLink {
+                            InfrastructurePreviewView()
+                        } label: {
+                            riderCuteJobRow(icon: "🛰️", title: "Base infrastructure", subtitle: "GPS • realtime • push", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     Button(action: signOut) {
                         HStack {
@@ -47,7 +100,7 @@ struct RiderProfileScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Profile")
         }
     }

@@ -9,14 +9,66 @@ struct AdminSettingsScreen: View {
             ScrollView {
                 VStack(spacing: 18) {
                     cuteCard("⚙️ System Settings", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        cuteRow(icon: "🎚️", title: "Feature toggles", subtitle: "Turn features on/off", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Feature Toggles",
+                                message: "Control center for enabling role-based modules per region.",
+                                icon: "🎚️",
+                                highlights: ["Gradual rollout", "Audit logging"]
+                            )
+                            .navigationTitle("Feature Toggles")
+                        } label: {
+                            cuteRow(icon: "🎚️", title: "Feature toggles", subtitle: "Turn features on/off", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        cuteRow(icon: "🗺️", title: "Coverage areas", subtitle: "Manage service regions", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Coverage Areas",
+                                message: "Admin mapping surface to expand serviceable areas.",
+                                icon: "🗺️",
+                                highlights: ["Syncs with GPS filters", "Exports to Rider app"]
+                            )
+                            .navigationTitle("Coverage Areas")
+                        } label: {
+                            cuteRow(icon: "🗺️", title: "Coverage areas", subtitle: "Manage service regions", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     cuteCard("👥 Team Management", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
-                        cuteRow(icon: "👨‍💼", title: "Admin team", subtitle: "Manage administrators", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Admin Team",
+                                message: "Assign roles + scopes for central operators.",
+                                icon: "👨‍💼",
+                                highlights: ["Per-module permissions", "Invite links"]
+                            )
+                            .navigationTitle("Admin Team")
+                        } label: {
+                            cuteRow(icon: "👨‍💼", title: "Admin team", subtitle: "Manage administrators", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        cuteRow(icon: "🔔", title: "Notifications", subtitle: "Alert preferences", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Admin Alerts",
+                                message: "Pick which push topics each admin receives.",
+                                icon: "🔔",
+                                highlights: ["Escalation tiers", "SMS failover"]
+                            )
+                            .navigationTitle("Notifications")
+                        } label: {
+                            cuteRow(icon: "🔔", title: "Notifications", subtitle: "Alert preferences", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    cuteCard("Foundation", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
+                        NavigationLink {
+                            InfrastructurePreviewView()
+                        } label: {
+                            cuteRow(icon: "🛰️", title: "Base infrastructure", subtitle: "GPS • realtime • push", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
                     Button(action: signOut) {
                         HStack {
@@ -47,7 +99,7 @@ struct AdminSettingsScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("❤️ Settings")
         }
     }

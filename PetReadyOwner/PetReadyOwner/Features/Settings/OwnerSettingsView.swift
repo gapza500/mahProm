@@ -9,13 +9,55 @@ struct OwnerSettingsView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     cuteCard("Account", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
-                        cuteInfoRow(icon: "👤", title: "Profile", subtitle: "Edit your info", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Profile Editor",
+                                message: "Preview of the form we'll wire up to Firestore profiles.",
+                                icon: "👤",
+                                highlights: ["Display name & contact", "Toggle between pets"]
+                            )
+                            .navigationTitle("Profile")
+                        } label: {
+                            cuteInfoRow(icon: "👤", title: "Profile", subtitle: "Edit your info", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                         Divider().padding(.leading, 50)
-                        cuteInfoRow(icon: "🔔", title: "Notifications", subtitle: "Manage alerts", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Notifications",
+                                message: "Control push + realtime topics per owner.",
+                                icon: "🔔",
+                                highlights: ["SOS escalation topic", "Clinic booking reminders"]
+                            )
+                            .navigationTitle("Notifications")
+                        } label: {
+                            cuteInfoRow(icon: "🔔", title: "Notifications", subtitle: "Manage alerts", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     cuteCard("Preferences", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        cuteInfoRow(icon: "🌐", title: "Language", subtitle: "TH / EN", showChevron: true)
+                        NavigationLink {
+                            FeaturePlaceholderView(
+                                title: "Language + Theme",
+                                message: "Toggle between Thai / English and dark mode roadmap.",
+                                icon: "🌐",
+                                highlights: ["Persisted via AppStorage"]
+                            )
+                            .navigationTitle("Preferences")
+                        } label: {
+                            cuteInfoRow(icon: "🌐", title: "Language", subtitle: "TH / EN", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    cuteCard("Foundation", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
+                        NavigationLink {
+                            InfrastructurePreviewView()
+                        } label: {
+                            cuteInfoRow(icon: "🛠️", title: "Base infrastructure", subtitle: "GPS • realtime • push", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
                     }
 
                     Button {
@@ -56,7 +98,7 @@ struct OwnerSettingsView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Settings")
         }
     }

@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct OwnerHealthView: View {
     var body: some View {
@@ -25,7 +26,7 @@ struct OwnerHealthView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Health")
         }
     }

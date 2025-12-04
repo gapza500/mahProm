@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct QueueMonitorView: View {
     var body: some View {
@@ -19,7 +20,7 @@ struct QueueMonitorView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Queue")
         }
     }

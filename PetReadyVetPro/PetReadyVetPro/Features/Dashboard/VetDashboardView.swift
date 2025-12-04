@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct VetDashboardView: View {
     var body: some View {
@@ -12,7 +13,7 @@ struct VetDashboardView: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Dashboard")
         }
     }

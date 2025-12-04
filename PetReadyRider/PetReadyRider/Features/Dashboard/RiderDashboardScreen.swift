@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct RiderDashboardScreen: View {
     var body: some View {
@@ -12,7 +13,7 @@ struct RiderDashboardScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Dashboard")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

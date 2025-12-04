@@ -16,6 +16,8 @@ struct VetAuthView: View {
     @State private var selectedRole: UserType = .vet
     @State private var errorMessage: String?
     @State private var isSubmitting = false
+    @State private var infoMessage: String?
+    @State private var showResetConfirmation = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -58,10 +60,23 @@ struct VetAuthView: View {
             }
 
             if let message = errorMessage ?? authService.errorDescription {
-                Text(message)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
+                AuthFeedbackBanner(status: .error, message: message)
+            }
+            if let infoMessage {
+                AuthFeedbackBanner(status: .info, message: infoMessage)
+            }
+
+            if mode == .login {
+                Button("Forgot password?") {
+                    guard !email.isEmpty else {
+                        errorMessage = "Enter your email first."
+                        return
+                    }
+                    showResetConfirmation = true
+                }
+                .font(.footnote.weight(.semibold))
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
 
             Button(action: submit) {
@@ -106,10 +121,19 @@ struct VetAuthView: View {
             .disabled(isSubmitting)
         }
         .padding()
+        .alert("Send password reset?", isPresented: $showResetConfirmation) {
+            Button("Send reset", role: .none) {
+                Task { await sendReset() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("We'll email reset instructions to \(email).")
+        }
     }
 
     private func submit() {
         errorMessage = nil
+        infoMessage = nil
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Email and password are required."
             return
@@ -153,5 +177,21 @@ struct VetAuthView: View {
             }
             isSubmitting = false
         }
+    }
+
+    private func sendReset() async {
+        guard !email.isEmpty else {
+            errorMessage = "Enter your email first."
+            return
+        }
+        isSubmitting = true
+        do {
+            try await authService.sendPasswordReset(email: email)
+            infoMessage = "Password reset email sent."
+            errorMessage = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isSubmitting = false
     }
 }

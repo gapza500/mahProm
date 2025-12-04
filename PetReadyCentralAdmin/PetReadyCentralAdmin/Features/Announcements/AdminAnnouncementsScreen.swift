@@ -1,4 +1,5 @@
 import SwiftUI
+import PetReadyShared
 
 struct AdminAnnouncementsScreen: View {
     var body: some View {
@@ -35,7 +36,7 @@ struct AdminAnnouncementsScreen: View {
                 }
                 .padding()
             }
-            .background(Color(hex: "FFF9FB"))
+            .background(DesignSystem.Colors.appBackground)
             .navigationTitle("🔔 Alerts")
         }
     }
