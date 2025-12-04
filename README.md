@@ -254,28 +254,57 @@ PetReady-Ecosystem/
 ├── PetReady-Owner/
 │   ├── App/
 │   │   └── PetReadyOwnerApp.swift
-│   ├── Features/                      # Auth, Home, Pets, Health, Clinics, Chat, Info, Settings, Components
+│   ├── Features/
+│   │   ├── Auth/
+│   │   ├── Home/
+│   │   ├── Pets/
+│   │   ├── Health/
+│   │   ├── Clinics/
+│   │   ├── Chat/
+│   │   ├── Info/
+│   │   ├── Settings/
+│   │   └── Components/
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-VetPro/
 │   ├── App/
 │   │   └── PetReadyVetProApp.swift
-│   ├── Features/                      # Auth, Dashboard, Patients, Queue, Content, Settings, Components
+│   ├── Features/
+│   │   ├── Auth/
+│   │   ├── Dashboard/
+│   │   ├── Patients/
+│   │   ├── Queue/
+│   │   ├── Content/
+│   │   ├── Settings/
+│   │   └── Components/
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-Rider/
 │   ├── App/
 │   │   └── PetReadyRiderApp.swift
-│   ├── Features/                      # Auth, Dashboard, Jobs, Wallet, Profile, Components
+│   ├── Features/
+│   │   ├── Auth/
+│   │   ├── Dashboard/
+│   │   ├── Jobs/
+│   │   ├── Wallet/
+│   │   ├── Profile/
+│   │   └── Components/
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-CentralAdmin/
 │   ├── App/
 │   │   └── PetReadyCentralAdminApp.swift
-│   ├── Features/                      # Auth, Dashboard, Approvals, Announcements, Analytics, Settings, Components
+│   ├── Features/
+│   │   ├── Auth/
+│   │   ├── Dashboard/
+│   │   ├── Approvals/
+│   │   ├── Announcements/
+│   │   ├── Analytics/
+│   │   ├── Settings/
+│   │   └── Components/
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
