@@ -190,8 +190,8 @@ The data model keeps a `microchipCode` field for future real‑chip integration�
 Each app now wires into a shared Firebase Auth + Firestore profile system:
 
 1. **Login surfaces**
-   - Owner app includes combined email/password signup + login.
-   - Rider, VetPro, and CentralAdmin apps expose “Request Access” flows that create pending profiles.
+   - Owner app includes combined email/password signup + login, plus Google Sign-In.
+   - Rider, VetPro, and CentralAdmin apps expose “Request Access” flows (with optional Google sign-in) that create pending profiles.
 2. **Profile document**
    - Every authenticated account must have `/users/{uid}` with `displayName`, `email`, `role`, and `status` (`pending/approved/rejected`).
    - Existing testers/admins should be seeded manually once; new signups write their own doc automatically.

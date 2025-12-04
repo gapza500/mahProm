@@ -84,6 +84,28 @@ struct OwnerAuthView: View {
                 .foregroundStyle(.white)
                 .disabled(isSubmitting)
             }
+
+            HStack {
+                Rectangle().fill(Color.secondary.opacity(0.3)).frame(height: 1)
+                Text("OR").font(.caption).foregroundStyle(.secondary)
+                Rectangle().fill(Color.secondary.opacity(0.3)).frame(height: 1)
+            }
+
+            Button(action: signInWithGoogle) {
+                HStack(spacing: 8) {
+                    Image(systemName: "globe")
+                    Text("Continue with Google")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 14))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                )
+            }
+            .disabled(isSubmitting)
         }
         .padding()
     }
@@ -107,7 +129,7 @@ struct OwnerAuthView: View {
         }
 
         isSubmitting = true
-        Task {
+        Task { @MainActor in
             do {
                 switch mode {
                 case .login:
@@ -122,6 +144,19 @@ struct OwnerAuthView: View {
                         phone: nil
                     )
                 }
+            } catch {
+                localError = error.localizedDescription
+            }
+            isSubmitting = false
+        }
+    }
+
+    private func signInWithGoogle() {
+        localError = nil
+        isSubmitting = true
+        Task { @MainActor in
+            do {
+                try await authService.signInWithGoogle()
             } catch {
                 localError = error.localizedDescription
             }
