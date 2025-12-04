@@ -2,40 +2,40 @@ import SwiftUI
 
 public enum DesignSystem {
     public enum Colors {
-        public static let appBackground = Color.dynamic(lightHex: "FFF9FB", darkHex: "0E1016")
-        public static let cardSurface = Color.dynamic(lightHex: "FFFFFF", darkHex: "1F1B24")
-        public static let cardStroke = Color.dynamic(lightHex: "F2E9F0", darkHex: "2F2A36")
-        public static let accentPink = Color.dynamic(lightHex: "FF9ECD", darkHex: "FFB5D8")
-        public static let accentBlue = Color.dynamic(lightHex: "A0D8F1", darkHex: "7EC9F5")
-        public static let accentMint = Color.dynamic(lightHex: "98D8AA", darkHex: "6FB98C")
-        public static let accentPeach = Color.dynamic(lightHex: "FFE5A0", darkHex: "DFA853")
-        public static let subtleText = Color.dynamic(lightHex: "7A7A89", darkHex: "C5C4CF")
+        public static let appBackground = Color.dynamic(lightHex: "FFF9FB", darkHex: "524C61") // earth-tone purple
+        public static let cardSurface = Color.dynamic(lightHex: "FFFFFF", darkHex: "3C3647")
+        public static let cardStroke = Color.dynamic(lightHex: "F2E9F0", darkHex: "5C5568")
+        public static let accentPink = Color.dynamic(lightHex: "FF9ECD", darkHex: "B89A79")
+        public static let accentBlue = Color.dynamic(lightHex: "A0D8F1", darkHex: "666D7D")
+        public static let accentMint = Color.dynamic(lightHex: "98D8AA", darkHex: "A4B089")
+        public static let accentPeach = Color.dynamic(lightHex: "FFE5A0", darkHex: "C7C49F")
+        public static let subtleText = Color.dynamic(lightHex: "7A7A89", darkHex: "E9E3D7")
     }
 
     public enum Gradients {
         public static let softBlue: [Color] = [
-            Color.dynamic(lightHex: "E8F4FF", darkHex: "1B2433"),
-            Color.dynamic(lightHex: "F0F8FF", darkHex: "111827")
+            Color.dynamic(lightHex: "E8F4FF", darkHex: "737D92"),
+            Color.dynamic(lightHex: "F0F8FF", darkHex: "666D7D")
         ]
 
         public static let blush: [Color] = [
-            Color.dynamic(lightHex: "FFE5EC", darkHex: "2C1821"),
-            Color.dynamic(lightHex: "FFF0F5", darkHex: "1B1016")
+            Color.dynamic(lightHex: "FFE5EC", darkHex: "AB8072"),
+            Color.dynamic(lightHex: "FFF0F5", darkHex: "8A8172")
         ]
 
         public static let lavender: [Color] = [
-            Color.dynamic(lightHex: "FFE5F1", darkHex: "2B1521"),
-            Color.dynamic(lightHex: "FFF0F7", darkHex: "1C0F17")
+            Color.dynamic(lightHex: "FFE5F1", darkHex: "8A8172"),
+            Color.dynamic(lightHex: "FFF0F7", darkHex: "6D5F63")
         ]
 
         public static let mint: [Color] = [
-            Color.dynamic(lightHex: "E8FFE8", darkHex: "122017"),
-            Color.dynamic(lightHex: "F0FFF0", darkHex: "111A14")
+            Color.dynamic(lightHex: "E8FFE8", darkHex: "A4B089"),
+            Color.dynamic(lightHex: "F0FFF0", darkHex: "7F8E6C")
         ]
 
         public static let heroSunrise: [Color] = [
-            Color.dynamic(lightHex: "FFB5D8", darkHex: "4B1F37"),
-            Color.dynamic(lightHex: "A0D8F1", darkHex: "1E3451")
+            Color.dynamic(lightHex: "FFB5D8", darkHex: "B89A79"),
+            Color.dynamic(lightHex: "A0D8F1", darkHex: "666D7D")
         ]
     }
 
