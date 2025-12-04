@@ -87,7 +87,7 @@ struct RiderAuthView: View {
                     LinearGradient(colors: [Color(hex: "A0D8F1"), Color(hex: "D4EDFF")], startPoint: .leading, endPoint: .trailing),
                     in: RoundedRectangle(cornerRadius: 16)
                 )
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .disabled(isSubmitting)
             }
 

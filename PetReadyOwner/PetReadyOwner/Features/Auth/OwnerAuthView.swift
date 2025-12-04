@@ -96,7 +96,7 @@ struct OwnerAuthView: View {
                     ),
                     in: RoundedRectangle(cornerRadius: 16)
                 )
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .disabled(isSubmitting)
             }
 

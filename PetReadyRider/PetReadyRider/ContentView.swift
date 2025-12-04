@@ -14,6 +14,7 @@ struct ContentView: View {
                 RiderProfileScreen()
                     .tabItem { Label("Profile", systemImage: "heart.fill") }
             }
+            .foregroundStyle(DesignSystem.Colors.primaryText)
             .tint(Color(hex: "A0D8F1"))
         }
     }

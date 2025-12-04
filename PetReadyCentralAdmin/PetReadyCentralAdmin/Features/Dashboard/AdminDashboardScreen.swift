@@ -38,7 +38,7 @@ struct AdminDashboardScreen: View {
                             Text("📢")
                             Text("Broadcast").font(.subheadline.weight(.semibold))
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
                         .background(
@@ -73,18 +73,18 @@ struct AdminDashboardScreen: View {
                         Text("🌟").font(.title)
                         Text("National Pet Dashboard")
                             .font(.title2.bold())
-                            .foregroundStyle(.white)
+                            .foregroundStyle(DesignSystem.Colors.onAccentText)
                     }
                     Text("Keeping all furry friends safe & happy!")
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.95))
+                        .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.95))
                     HStack(spacing: 12) {
                         Label("5min", systemImage: "clock.fill")
                         Text("•")
                         Label("99% happy", systemImage: "heart.fill")
                     }
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.9))
                     .padding(.top, 4)
                 }
                 Spacer()

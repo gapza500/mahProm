@@ -34,7 +34,7 @@ struct RiderWalletScreen: View {
                         Image(systemName: "arrow.down.circle.fill").font(.title2)
                         Text("Withdraw").font(.caption.weight(.semibold))
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DesignSystem.Colors.onAccentText)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                     .background(

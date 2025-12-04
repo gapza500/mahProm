@@ -5,7 +5,7 @@ func riderCuteCard<Content: View>(_ title: String, gradient: [Color], @ViewBuild
     VStack(alignment: .leading, spacing: 18) {
         Text(title)
             .font(.title3.bold())
-            .foregroundStyle(.primary)
+            .foregroundStyle(DesignSystem.Colors.primaryText)
         content()
     }
     .padding(22)
@@ -32,10 +32,10 @@ func riderCuteInfoRow(icon: String, title: String, subtitle: String) -> some Vie
         VStack(alignment: .leading, spacing: 3) {
             Text(title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(DesignSystem.Colors.primaryText)
             Text(subtitle)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignSystem.Colors.secondaryText)
         }
 
         Spacer()
@@ -47,16 +47,16 @@ func riderCuteJobRow(icon: String, title: String, subtitle: String, badge: Strin
         Text(icon)
             .font(.system(size: 24))
             .frame(width: 40, height: 40)
-            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+            .background(Circle().fill(DesignSystem.Colors.cardSurface).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
         VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.body.weight(.semibold)).foregroundStyle(.primary)
-            Text(subtitle).font(.caption).foregroundStyle(.secondary)
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(DesignSystem.Colors.primaryText)
+            Text(subtitle).font(.caption).foregroundStyle(DesignSystem.Colors.secondaryText)
         }
         Spacer()
         if let badge = badge, let badgeColor = badgeColor {
             Text(badge)
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(badgeColor, in: Capsule())
@@ -65,7 +65,7 @@ func riderCuteJobRow(icon: String, title: String, subtitle: String, badge: Strin
         if showChevron {
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(DesignSystem.Colors.mutedText)
         }
     }
     .padding(.vertical, 4)

@@ -76,7 +76,7 @@ struct AdminSettingsScreen: View {
                                 .font(.body.weight(.semibold))
                             Image(systemName: "arrow.right.square.fill")
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(

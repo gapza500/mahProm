@@ -27,6 +27,7 @@ struct ContentView: View {
                 OwnerSettingsView()
                     .tabItem { Label("Settings", systemImage: "heart.fill") }
             }
+            .foregroundStyle(DesignSystem.Colors.primaryText)
             .tint(Color(hex: "FF9ECD"))
         }
     }

@@ -16,6 +16,7 @@ struct ContentView: View {
                 AdminSettingsScreen()
                     .tabItem { Label("Settings", systemImage: "heart.fill") }
             }
+            .foregroundStyle(DesignSystem.Colors.primaryText)
             .tint(Color(hex: "FF9ECD"))
         }
     }

@@ -94,7 +94,7 @@ struct VetAuthView: View {
                     LinearGradient(colors: [Color(hex: "FF9ECD"), Color(hex: "FFB5D8")], startPoint: .leading, endPoint: .trailing),
                     in: RoundedRectangle(cornerRadius: 16)
                 )
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .disabled(isSubmitting)
             }
 

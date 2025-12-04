@@ -22,7 +22,7 @@ struct RiderDashboardScreen: View {
                             Image(systemName: "antenna.radiowaves.left.and.right")
                             Text("Go Online").font(.subheadline.weight(.semibold))
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(
@@ -42,17 +42,17 @@ struct RiderDashboardScreen: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Ready for Dispatch! 🚴")
                         .font(.title2.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                     Text("Keep acceptance >90% for bonuses")
                         .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.95))
+                        .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.95))
                     HStack(spacing: 12) {
                         Label("92%", systemImage: "checkmark.circle.fill")
                         Text("•")
                         Label("Level 3", systemImage: "star.fill")
                     }
                     .font(.caption.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.9))
                     .padding(.top, 4)
                 }
                 Spacer()
@@ -145,7 +145,7 @@ struct RiderDashboardScreen: View {
                             Text("Navigate")
                         }
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(Color(hex: "FF9ECD"), in: Capsule())
@@ -179,7 +179,7 @@ struct RiderDashboardScreen: View {
                     Button {} label: {
                         Text("Accept")
                             .font(.caption.weight(.bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(DesignSystem.Colors.onAccentText)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
                             .background(Color(hex: "A0D8F1"), in: Capsule())

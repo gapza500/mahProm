@@ -96,7 +96,7 @@ public struct InfrastructurePreviewView: View {
                                 Text("Simulate Request")
                                     .font(.subheadline.weight(.semibold))
                             }
-                            .foregroundStyle(.white)
+                            .foregroundStyle(DesignSystem.Colors.onAccentText)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
                             .background(permissionColor, in: RoundedRectangle(cornerRadius: 14))

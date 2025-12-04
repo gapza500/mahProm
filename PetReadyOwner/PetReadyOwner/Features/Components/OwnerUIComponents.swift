@@ -10,7 +10,7 @@ func cuteCard<Content: View>(
     VStack(alignment: .leading, spacing: 18) {
         Text(title)
             .font(.title3.bold())
-            .foregroundStyle(.primary)
+            .foregroundStyle(DesignSystem.Colors.primaryText)
         content()
     }
     .padding(22)
@@ -46,10 +46,10 @@ func cuteActionRow(icon: String, title: String, subtitle: String, badge: String?
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.body.weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(DesignSystem.Colors.primaryText)
             Text(subtitle)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignSystem.Colors.secondaryText)
         }
 
         Spacer()
@@ -57,7 +57,7 @@ func cuteActionRow(icon: String, title: String, subtitle: String, badge: String?
         if let badge = badge, let badgeColor = badgeColor {
             Text(badge)
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(badgeColor, in: Capsule())
@@ -67,7 +67,7 @@ func cuteActionRow(icon: String, title: String, subtitle: String, badge: String?
         if showChevron {
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(DesignSystem.Colors.mutedText)
         }
     }
     .padding(.vertical, 6)
@@ -87,10 +87,10 @@ func cuteInfoRow(icon: String, title: String, subtitle: String, badge: String? =
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.body.weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(DesignSystem.Colors.primaryText)
             Text(subtitle)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(DesignSystem.Colors.secondaryText)
         }
 
         Spacer()
@@ -98,7 +98,7 @@ func cuteInfoRow(icon: String, title: String, subtitle: String, badge: String? =
         if let badge = badge, let badgeColor = badgeColor {
             Text(badge)
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(badgeColor, in: Capsule())

@@ -12,7 +12,7 @@ func vetCuteStatusTile(icon: String, title: String, subtitle: String, colors: [C
             )
         Text(title)
             .font(.caption.weight(.medium))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(DesignSystem.Colors.secondaryText)
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, 18)
@@ -40,7 +40,7 @@ func vetCuteCard<Content: View>(_ title: String, gradient: [Color], @ViewBuilder
         if !title.isEmpty {
             Text(title)
                 .font(.title3.bold())
-                .foregroundStyle(.primary)
+                .foregroundStyle(DesignSystem.Colors.primaryText)
         }
         content()
     }
@@ -65,22 +65,22 @@ func vetCuteActionRow(icon: String, title: String, subtitle: String, badge: Stri
         Text(icon)
             .font(.system(size: 28))
             .frame(width: 44, height: 44)
-            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+            .background(Circle().fill(DesignSystem.Colors.cardSurface).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
         VStack(alignment: .leading, spacing: 5) {
-            Text(title).font(.body.weight(.semibold)).foregroundStyle(.primary)
-            Text(subtitle).font(.caption).foregroundStyle(.secondary)
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(DesignSystem.Colors.primaryText)
+            Text(subtitle).font(.caption).foregroundStyle(DesignSystem.Colors.secondaryText)
         }
         Spacer()
         if let badge = badge, let badgeColor = badgeColor {
             Text(badge)
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .padding(.horizontal, 12).padding(.vertical, 6)
                 .background(badgeColor, in: Capsule())
                 .shadow(color: badgeColor.opacity(0.3), radius: 4, y: 2)
         }
         if showChevron {
-            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(.tertiary)
+            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(DesignSystem.Colors.mutedText)
         }
     }
     .padding(.vertical, 6)
@@ -118,21 +118,21 @@ func vetCuteInfoRow(icon: String, title: String, subtitle: String, badge: String
         Text(icon)
             .font(.system(size: 24))
             .frame(width: 40, height: 40)
-            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+            .background(Circle().fill(DesignSystem.Colors.cardSurface).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
         VStack(alignment: .leading, spacing: 4) {
-            Text(title).font(.body.weight(.semibold)).foregroundStyle(.primary)
-            Text(subtitle).font(.caption).foregroundStyle(.secondary)
+            Text(title).font(.body.weight(.semibold)).foregroundStyle(DesignSystem.Colors.primaryText)
+            Text(subtitle).font(.caption).foregroundStyle(DesignSystem.Colors.secondaryText)
         }
         Spacer()
         if let badge = badge, let badgeColor = badgeColor {
             Text(badge)
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .padding(.horizontal, 10).padding(.vertical, 5)
                 .background(badgeColor, in: Capsule())
         }
         if showChevron {
-            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(.tertiary)
+            Image(systemName: "chevron.right").font(.caption.weight(.bold)).foregroundStyle(DesignSystem.Colors.mutedText)
         }
     }
     .padding(.vertical, 4)

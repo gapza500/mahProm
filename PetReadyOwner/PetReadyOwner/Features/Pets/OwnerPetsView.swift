@@ -43,7 +43,7 @@ struct OwnerPetsView: View {
                             Text("Add")
                                 .font(.subheadline.weight(.semibold))
                         }
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(
@@ -90,7 +90,7 @@ struct OwnerPetsView: View {
                 HStack(spacing: 8) {
                     Text(type)
                         .font(.caption.weight(.medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
                         .background(Color(hex: "A0D8F1"), in: Capsule())

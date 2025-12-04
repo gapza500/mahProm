@@ -61,12 +61,12 @@ private struct SplashScreenView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 100, height: 100)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                 }
 
                 Text(appName)
                     .font(.largeTitle.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DesignSystem.Colors.onAccentText)
 
                 ProgressView()
                     .progressViewStyle(.circular)

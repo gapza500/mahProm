@@ -16,6 +16,7 @@ struct ContentView: View {
                 VetSettingsView()
                     .tabItem { Label("Settings", systemImage: "gearshape.fill") }
             }
+            .foregroundStyle(DesignSystem.Colors.primaryText)
             .tint(Color(hex: "FF9ECD"))
         }
     }

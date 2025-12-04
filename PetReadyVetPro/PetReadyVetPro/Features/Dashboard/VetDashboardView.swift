@@ -23,17 +23,17 @@ struct VetDashboardView: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Good Morning, Dr. Siri! 👩‍⚕️")
                     .font(.title2.bold())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DesignSystem.Colors.onAccentText)
                 Text("You’re on a 4.2⭐ response streak")
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.95))
+                    .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.95))
                 HStack(spacing: 8) {
                     Label("Verified", systemImage: "checkmark.seal.fill")
                     Text("•")
                     Text("Reply < 5 min")
                 }
                 .font(.caption.weight(.medium))
-                .foregroundStyle(.white.opacity(0.85))
+                .foregroundStyle(DesignSystem.Colors.onAccentText.opacity(0.85))
                 .padding(.top, 4)
             }
             Spacer()
@@ -80,7 +80,7 @@ struct VetDashboardView: View {
                     Spacer()
                     Button("Join") {}
                         .font(.caption.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DesignSystem.Colors.onAccentText)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
                         .background(Color(hex: "FF9ECD"), in: Capsule())

@@ -83,7 +83,7 @@ public struct FirebaseEmailLoginView: View {
                     ),
                     in: RoundedRectangle(cornerRadius: 14)
                 )
-                .foregroundStyle(.white)
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
                 .disabled(isSubmitting)
             }
 

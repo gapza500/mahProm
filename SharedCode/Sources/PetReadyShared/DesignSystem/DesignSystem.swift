@@ -9,7 +9,10 @@ public enum DesignSystem {
         public static let accentBlue = Color.dynamic(lightHex: "A0D8F1", darkHex: "666D7D")
         public static let accentMint = Color.dynamic(lightHex: "98D8AA", darkHex: "A4B089")
         public static let accentPeach = Color.dynamic(lightHex: "FFE5A0", darkHex: "C7C49F")
-        public static let subtleText = Color.dynamic(lightHex: "7A7A89", darkHex: "E9E3D7")
+        public static let primaryText = Color.dynamic(lightHex: "1C1D21", darkHex: "F4EFE7")
+        public static let secondaryText = Color.dynamic(lightHex: "6F6F80", darkHex: "D3CBC2")
+        public static let mutedText = Color.dynamic(lightHex: "9C9DB0", darkHex: "ADA4B2")
+        public static let onAccentText = Color.dynamic(lightHex: "FFFFFF", darkHex: "FAF4EC")
     }
 
     public enum Gradients {
