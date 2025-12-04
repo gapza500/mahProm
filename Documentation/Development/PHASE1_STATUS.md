@@ -8,7 +8,7 @@
 | Shared Module | ✅ | `Package.swift` + full `PetReadyShared` sources (models, services, repositories, utilities, tests, Keychain + Auth service). |
 | Backend Server | ✅ | Express server split into modular routers, Socket.IO hub, configuration files, and npm dependencies installed. |
 | Cloud Database Prep | ✅ | CloudKit service wrapper in code + `Documentation/Development/CLOUDKIT_SETUP.md` to configure the shared container. |
-| Authentication System | ✅ | Auth endpoints on the backend plus shared `AuthService` (OTP verification, Keychain storage) + `KeychainService`. |
+| Authentication System | ✅ | Shared Firebase Auth service with per-app login/request views, role claims, Firestore profiles, and auto-refreshing approval gates. |
 | Build/Test Automation | ✅ | Scripts for build/test/deploy/setup/integration/perf/security/backup updated to modern simulator targets. |
 | Workspace Integration | ✅ | `PetReady.xcworkspace` now references `Package.swift` so the shared module is visible in all targets. |
 | Configuration Assets | ✅ | Environment YAMLs, `.env.example`, Brewfile, feature flags, and tooling READMEs added. |

@@ -12,6 +12,7 @@ import PetReadyShared
 @main
 struct PetReadyRiderApp: App {
     @StateObject private var appContext = RiderAppContext()
+    @StateObject private var authService = AuthService()
 
     init() {
         AppBootstrap.configureFirebaseIfNeeded()
@@ -22,6 +23,7 @@ struct PetReadyRiderApp: App {
             SplashScreenContainer(appName: "PetReady Rider", accentColor: Color(red: 0.21, green: 0.73, blue: 0.73)) {
                 ContentView()
                     .environmentObject(appContext)
+                    .environmentObject(authService)
             }
         }
     }

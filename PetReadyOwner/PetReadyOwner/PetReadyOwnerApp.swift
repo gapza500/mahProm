@@ -14,8 +14,7 @@ struct PetReadyOwnerApp: App {
 
     init() {
         AppBootstrap.configureFirebaseIfNeeded()
-        let client = APIClient(baseURL: URL(string: "https://api.petready.app/v1")!)
-        _authService = StateObject(wrappedValue: AuthService(apiClient: client))
+        _authService = StateObject(wrappedValue: AuthService())
     }
 
     var body: some Scene {

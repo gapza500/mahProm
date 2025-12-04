@@ -28,7 +28,8 @@ let package = Package(
                 "Kingfisher",
                 .product(name: "RealmSwift", package: "realm-swift"),
                 "Starscream",
-                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk", condition: .when(platforms: [.iOS]))
+                .product(name: "FirebaseFirestore", package: "firebase-ios-sdk", condition: .when(platforms: [.iOS])),
+                .product(name: "FirebaseAuth", package: "firebase-ios-sdk", condition: .when(platforms: [.iOS]))
             ],
             path: "SharedCode/Sources/PetReadyShared"
         ),

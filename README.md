@@ -185,6 +185,26 @@ The data model keeps a `microchipCode` field for future real‑chip integration�
 
 ---
 
+## Role-Based Authentication & Approvals
+
+Each app now wires into a shared Firebase Auth + Firestore profile system:
+
+1. **Login surfaces**
+   - Owner app includes combined email/password signup + login.
+   - Rider, VetPro, and CentralAdmin apps expose “Request Access” flows that create pending profiles.
+2. **Profile document**
+   - Every authenticated account must have `/users/{uid}` with `displayName`, `email`, `role`, and `status` (`pending/approved/rejected`).
+   - Existing testers/admins should be seeded manually once; new signups write their own doc automatically.
+3. **Approvals**
+   - Central Admin → “Approvals” tab lists Firestore users with `status = pending`. Approving flips the status (and you can set custom claims via script/Cloud Function).
+   - RoleGate automatically refreshes pending accounts every 10 seconds, so the user sees the approval without reinstalling.
+4. **Security rules**
+   - See `Documentation/Guidelines/firestore_rules_dev.md` for a starting rule set and instructions on setting `roles` claims.
+
+_TL;DR_: seed the profile doc + claim, use the new login UI per app, approve from Central Admin, and the rest of the apps unlock themselves.
+
+---
+
 ## Multi-App Folder Structure
 
 ```

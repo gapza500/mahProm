@@ -11,7 +11,39 @@ public struct Coordinate: Codable, Equatable {
 }
 
 public enum UserType: String, Codable {
-    case owner, vet, clinic, admin, rider
+    case owner, vet, clinic, admin, rider, tester
+}
+
+public enum UserApprovalStatus: String, Codable {
+    case pending, approved, rejected
+}
+
+public struct UserProfile: Identifiable, Codable {
+    public let id: String
+    public var displayName: String
+    public var email: String
+    public var phone: String?
+    public var role: UserType
+    public var status: UserApprovalStatus
+    public var createdAt: Date?
+
+    public init(
+        id: String,
+        displayName: String,
+        email: String,
+        phone: String? = nil,
+        role: UserType,
+        status: UserApprovalStatus,
+        createdAt: Date? = nil
+    ) {
+        self.id = id
+        self.displayName = displayName
+        self.email = email
+        self.phone = phone
+        self.role = role
+        self.status = status
+        self.createdAt = createdAt
+    }
 }
 
 public struct User: Identifiable, Codable, Equatable {

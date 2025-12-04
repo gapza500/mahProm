@@ -12,6 +12,7 @@ import PetReadyShared
 @main
 struct PetReadyVetProApp: App {
     @StateObject private var appContext = VetProAppContext()
+    @StateObject private var authService = AuthService()
 
     init() {
         AppBootstrap.configureFirebaseIfNeeded()
@@ -22,6 +23,7 @@ struct PetReadyVetProApp: App {
             SplashScreenContainer(appName: "PetReady VetPro", accentColor: Color(red: 0.63, green: 0.45, blue: 0.90)) {
                 ContentView()
                     .environmentObject(appContext)
+                    .environmentObject(authService)
             }
         }
     }

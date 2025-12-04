@@ -19,7 +19,11 @@ struct OwnerSettingsView: View {
                     }
 
                     Button {
-                        authService.logout()
+                        do {
+                            try authService.signOut()
+                        } catch {
+                            print("Failed to sign out: \(error.localizedDescription)")
+                        }
                     } label: {
                         HStack {
                             Text("Logout")

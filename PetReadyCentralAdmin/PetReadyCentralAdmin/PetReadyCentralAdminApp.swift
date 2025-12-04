@@ -13,6 +13,7 @@ import PetReadyShared
 @main
 struct PetReadyCentralAdminApp: App {
     @StateObject private var appContext = CentralAdminContext()
+    @StateObject private var authService = AuthService()
 
     init() {
         AppBootstrap.configureFirebaseIfNeeded()
@@ -23,6 +24,7 @@ struct PetReadyCentralAdminApp: App {
             SplashScreenContainer(appName: "PetReady Admin", accentColor: Color(red: 0.18, green: 0.39, blue: 0.82)) {
                 ContentView()
                     .environmentObject(appContext)
+                    .environmentObject(authService)
             }
         }
     }
