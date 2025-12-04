@@ -211,22 +211,19 @@ Each app now wires into a shared Firebase Auth + Firestore profile system:
 
 ```
 PetReady-Ecosystem/
-├── Backend/                          # Node/Express API + Socket.IO hub
-├── Documentation/                    # Phase tracking, API notes, setup guides
-├── SharedCode/                       # Swift package consumed by every app
-│   └── Sources/PetReadyShared/
-│       ├── DesignSystem/             # Global colors/gradients/metrics
-│       ├── Models + Services         # AuthService, repositories, utilities
-│       ├── Views/                    # Shared SwiftUI surfaces (auth, placeholders)
-├── PetReadyOwner/                    # Owner iOS target (SwiftUI)
-├── PetReadyVetPro/                   # Vet/Clinic target
-├── PetReadyRider/                    # Rider/Transport target
-├── PetReadyCentralAdmin/             # Government/Admin target
-├── Scripts/                          # build/test/deploy helpers
-└── Tools/, Config/, Backend/, etc.   # Supporting infrastructure
+├── PetReady-Owner/ (PetReadyOwner/)           # Consumer app (App/Views/ViewModels/Services/Resources/Tests)
+├── PetReady-VetPro/ (PetReadyVetPro/)         # Veterinary professional app
+├── PetReady-Rider/ (PetReadyRider/)           # Transport service app
+├── PetReady-CentralAdmin/ (PetReadyCentralAdmin/)  # Government oversight app
+├── SharedCode/                                # Swift package (Models/Services/Utilities/Networking/Resources)
+├── Backend/                                   # API, WebSocket, database, auth, push, deployment
+├── Documentation/                             # Architecture/API/Deployment/UserGuides
+├── Scripts/                                   # build/test/deploy helpers
+├── Config/                                    # environment + feature flag files
+└── Tools/                                     # CLI + automation utilities
 ```
 
-Each Xcode project imports `PetReadyShared` via the workspace so that services, shared UI, and the design system stay in sync.
+Each Xcode project imports `PetReadyShared` via the workspace so that services, shared UI, and design tokens stay in sync.
 
 ## Current App Flow (Phase 1 State)
 
