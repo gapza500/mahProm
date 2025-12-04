@@ -7,58 +7,28 @@ PetReady-Ecosystem/
 ├── PetReady-Owner/                     # Consumer app (folder name: PetReadyOwner/)
 │   ├── App/
 │   │   └── PetReadyOwnerApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── Homepage/
-│   │   ├── Pet/
-│   │   ├── Health/
-│   │   ├── Clinic/
-│   │   ├── Chat/
-│   │   ├── Information/
-│   │   └── Settings/
-│   ├── ViewModels/
+│   ├── Features/                       # Auth, Home, Pets, Health, Clinics, Chat, Info, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-VetPro/                    # Veterinary professional app (folder name: PetReadyVetPro/)
 │   ├── App/
 │   │   └── PetReadyVetProApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── VetMode/
-│   │   ├── ClinicAdminMode/
-│   │   ├── Patients/
-│   │   ├── Consultations/
-│   │   └── Analytics/
-│   ├── ViewModels/
+│   ├── Features/                       # Auth, Dashboard, Patients, Queue, Content, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-Rider/                     # Transport service app (folder name: PetReadyRider/)
 │   ├── App/
 │   │   └── PetReadyRiderApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Jobs/
-│   │   ├── Navigation/
-│   │   ├── MoneyPocket/
-│   │   └── Profile/
-│   ├── ViewModels/
+│   ├── Features/                       # Auth, Dashboard, Jobs, Wallet, Profile, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
 ├── PetReady-CentralAdmin/              # Government oversight app (folder name: PetReadyCentralAdmin/)
 │   ├── App/
 │   │   └── PetReadyCentralAdminApp.swift
-│   ├── Views/
-│   │   ├── Dashboard/
-│   │   ├── UserManagement/
-│   │   ├── ProblemResolution/
-│   │   ├── SystemMonitoring/
-│   │   ├── ContentControl/
-│   │   └── Analytics/
-│   ├── ViewModels/
+│   ├── Features/                       # Auth, Dashboard, Approvals, Alerts, Analytics, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/

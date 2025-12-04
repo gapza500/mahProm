@@ -211,7 +211,7 @@ Each app now wires into a shared Firebase Auth + Firestore profile system:
 
 ```
 PetReady-Ecosystem/
-├── PetReady-Owner/ (PetReadyOwner/)           # Consumer app (App/Views/ViewModels/Services/Resources/Tests)
+├── PetReady-Owner/ (PetReadyOwner/)           # Consumer app (App/Features/Services/Resources/Tests)
 ├── PetReady-VetPro/ (PetReadyVetPro/)         # Veterinary professional app
 ├── PetReady-Rider/ (PetReadyRider/)           # Transport service app
 ├── PetReady-CentralAdmin/ (PetReadyCentralAdmin/)  # Government oversight app
@@ -251,61 +251,31 @@ _TL;DR_: seed the profile doc + claim, use the new login UI per app, approve fro
 
 ```
 PetReady-Ecosystem/
-├── PetReady-Owner/                     # Consumer app
+├── PetReady-Owner/
 │   ├── App/
 │   │   └── PetReadyOwnerApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── Homepage/
-│   │   ├── Pet/
-│   │   ├── Health/
-│   │   ├── Clinic/
-│   │   ├── Chat/
-│   │   ├── Information/
-│   │   └── Settings/
-│   ├── ViewModels/
+│   ├── Features/                      # Auth, Home, Pets, Health, Clinics, Chat, Info, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
-├── PetReady-VetPro/                    # Veterinary professional app
+├── PetReady-VetPro/
 │   ├── App/
 │   │   └── PetReadyVetProApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── VetMode/
-│   │   ├── ClinicAdminMode/
-│   │   ├── Patients/
-│   │   ├── Consultations/
-│   │   └── Analytics/
-│   ├── ViewModels/
+│   ├── Features/                      # Auth, Dashboard, Patients, Queue, Content, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
-├── PetReady-Rider/                     # Transport service app
+├── PetReady-Rider/
 │   ├── App/
 │   │   └── PetReadyRiderApp.swift
-│   ├── Views/
-│   │   ├── Auth/
-│   │   ├── Dashboard/
-│   │   ├── Jobs/
-│   │   ├── Navigation/
-│   │   ├── MoneyPocket/
-│   │   └── Profile/
-│   ├── ViewModels/
+│   ├── Features/                      # Auth, Dashboard, Jobs, Wallet, Profile, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
-├── PetReady-CentralAdmin/              # Government oversight app
+├── PetReady-CentralAdmin/
 │   ├── App/
 │   │   └── PetReadyCentralAdminApp.swift
-│   ├── Views/
-│   │   ├── Dashboard/
-│   │   ├── UserManagement/
-│   │   ├── ProblemResolution/
-│   │   ├── SystemMonitoring/
-│   │   ├── ContentControl/
-│   │   └── Analytics/
-│   ├── ViewModels/
+│   ├── Features/                      # Auth, Dashboard, Approvals, Announcements, Analytics, Settings, Components
 │   ├── Services/
 │   ├── Resources/
 │   └── Tests/
