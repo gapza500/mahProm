@@ -266,10 +266,10 @@ struct OwnerSOSRequestView: View {
                 if let activeCase = viewModel.activeCase {
                     OwnerSOSConfirmationView(
                         caseItem: activeCase,
-                        initialCountdown: viewModel.countdownDuration,
                         onCancel: {
                             Task { await viewModel.cancelActiveCase() }
-                        }
+                        },
+                        initialCountdown: viewModel.countdownDuration
                     )
                     NavigationLink(
                         destination: OwnerSOSCaseDetailView(caseItem: Binding(
@@ -480,7 +480,7 @@ struct OwnerSOSConfirmationView: View {
             countdownActive = allowAutoCancel
             tickDown()
         }
-        .onChange(of: caseItem.status) { _ in
+        .onChange(of: caseItem.status) { _, _ in
             countdownActive = allowAutoCancel
         }
     }
