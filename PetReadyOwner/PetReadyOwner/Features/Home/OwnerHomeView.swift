@@ -412,7 +412,7 @@ final class OwnerSOSViewModel: ObservableObject {
     private var hasStarted = false
 
     init(
-        service: SOSServiceProtocol = SOSService.shared,
+        service: SOSServiceProtocol = SOSServiceFactory.make(),
         locationService: LocationServiceProtocol = LocationService(),
         pushService: PushNotificationServiceProtocol = PushNotificationService()
     ) {

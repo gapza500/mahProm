@@ -284,7 +284,7 @@ final class AdminSOSMonitorViewModel: ObservableObject {
     private let realtime: RealtimeSyncServiceProtocol
     private var hasStarted = false
 
-    init(service: SOSServiceProtocol = SOSService.shared, realtime: RealtimeSyncServiceProtocol = RealtimeSyncService()) {
+    init(service: SOSServiceProtocol = SOSServiceFactory.make(), realtime: RealtimeSyncServiceProtocol = RealtimeSyncService()) {
         self.service = service
         self.realtime = realtime
     }

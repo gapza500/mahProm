@@ -5,7 +5,7 @@ import PetReadyShared
 struct RiderJobsScreen: View {
     @EnvironmentObject private var authService: AuthService
     @StateObject private var viewModel = RiderJobsViewModel(
-        service: SOSService.shared,
+        service: SOSServiceFactory.make(),
         locationService: LocationService()
     )
 

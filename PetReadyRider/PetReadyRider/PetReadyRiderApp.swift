@@ -34,7 +34,7 @@ final class RiderAppContext: ObservableObject {
     let mapsService = MapsService()
     let locationService = LocationService()
 
-    init(service: SOSServiceProtocol = SOSService.shared) {
+    init(service: SOSServiceProtocol = SOSServiceFactory.make()) {
         self.sosService = service
     }
 }
