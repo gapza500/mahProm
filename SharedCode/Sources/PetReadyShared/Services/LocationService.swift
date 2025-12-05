@@ -67,7 +67,7 @@ public final class LocationService: NSObject, LocationServiceProtocol {
         return cachedSnapshot
     }
 
-    public func authorizationStatusDescription: String {
+    public var authorizationStatusDescription: String {
 #if canImport(CoreLocation)
         switch manager.authorizationStatus {
         case .notDetermined:
