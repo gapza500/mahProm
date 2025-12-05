@@ -125,7 +125,7 @@ struct AdminDashboardScreen: View {
 
     private var metrics: some View {
         let activeSOS = sosViewModel.cases.filter { $0.status != .completed && $0.status != .cancelled }.count
-        HStack(spacing: 14) {
+        return HStack(spacing: 14) {
             cuteMetricTile(emoji: "🆘", title: "SOS", value: "\(activeSOS)", subtitle: "Active", colors: [Color(hex: "FFB5D8"), Color(hex: "FFD4E8")])
             cuteMetricTile(emoji: "✅", title: "Approvals", value: "8", subtitle: "Waiting", colors: [Color(hex: "A0D8F1"), Color(hex: "D4EDFF")])
             cuteMetricTile(emoji: "🔔", title: "Alerts", value: "1", subtitle: "Active", colors: [Color(hex: "FFE5A0"), Color(hex: "FFF3D4")])
