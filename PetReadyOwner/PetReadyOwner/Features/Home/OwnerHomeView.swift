@@ -307,6 +307,11 @@ struct OwnerSOSConfirmationView: View {
 
     @State private var countdown: Int = 20
     @State private var isCancelling = false
+    @State private var countdownActive = true
+
+    private var allowAutoCancel: Bool {
+        caseItem.status == .pending || caseItem.status == .awaitingAssignment
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -353,9 +358,15 @@ struct OwnerSOSConfirmationView: View {
             }
 
             HStack {
-                Text("Auto-cancel in \(countdown)s")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
+                if allowAutoCancel {
+                    Text("Auto-cancel in \(countdown)s")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("Auto-cancel paused (assigned)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 Spacer()
                 Button {
                     guard !isCancelling else { return }
@@ -377,16 +388,22 @@ struct OwnerSOSConfirmationView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color(hex: "FFB5D8").opacity(0.3), lineWidth: 1)
         )
-        .onAppear { tickDown() }
+        .onAppear {
+            countdownActive = allowAutoCancel
+            tickDown()
+        }
+        .onChange(of: caseItem.status) { _ in
+            countdownActive = allowAutoCancel
+        }
     }
 
     private func tickDown() {
         Task {
-            while countdown > 0 && !isCancelling {
+            while countdown > 0 && !isCancelling && countdownActive && allowAutoCancel {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
                 await MainActor.run { countdown -= 1 }
             }
-            if countdown == 0 && !isCancelling {
+            if countdown == 0 && !isCancelling && allowAutoCancel {
                 onCancel()
             }
         }
