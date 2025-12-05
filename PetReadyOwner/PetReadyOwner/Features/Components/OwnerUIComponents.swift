@@ -4,7 +4,7 @@ import PetReadyShared
 // Shared styling helpers used across owner features
 func cuteCard<Content: View>(
     _ title: String,
-    gradient: [Color] = DesignSystem.Gradients.blush,
+    gradient: [Color] = DesignSystem.Gradients.ownerCard,
     @ViewBuilder content: () -> Content
 ) -> some View {
     VStack(alignment: .leading, spacing: 18) {
@@ -18,7 +18,6 @@ func cuteCard<Content: View>(
         ZStack {
             RoundedRectangle(cornerRadius: DesignSystem.Metrics.cardCornerRadius)
                 .fill(DesignSystem.Colors.cardSurface)
-
             RoundedRectangle(cornerRadius: DesignSystem.Metrics.cardCornerRadius)
                 .fill(
                     LinearGradient(colors: gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -108,7 +107,7 @@ func cuteInfoRow(icon: String, title: String, subtitle: String, badge: String? =
         if showChevron {
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(DesignSystem.Colors.mutedText)
         }
     }
     .padding(.vertical, 4)

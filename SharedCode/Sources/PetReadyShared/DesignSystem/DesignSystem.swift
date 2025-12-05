@@ -2,43 +2,51 @@ import SwiftUI
 
 public enum DesignSystem {
     public enum Colors {
-        public static let appBackground = Color.dynamic(lightHex: "FFF9FB", darkHex: "524C61") // earth-tone purple
-        public static let cardSurface = Color.dynamic(lightHex: "FFFFFF", darkHex: "3C3647")
-        public static let cardStroke = Color.dynamic(lightHex: "F2E9F0", darkHex: "5C5568")
-        public static let accentPink = Color.dynamic(lightHex: "FF9ECD", darkHex: "B89A79")
-        public static let accentBlue = Color.dynamic(lightHex: "A0D8F1", darkHex: "666D7D")
-        public static let accentMint = Color.dynamic(lightHex: "98D8AA", darkHex: "A4B089")
-        public static let accentPeach = Color.dynamic(lightHex: "FFE5A0", darkHex: "C7C49F")
-        public static let primaryText = Color.dynamic(lightHex: "1C1D21", darkHex: "F4EFE7")
-        public static let secondaryText = Color.dynamic(lightHex: "6F6F80", darkHex: "D3CBC2")
-        public static let mutedText = Color.dynamic(lightHex: "9C9DB0", darkHex: "ADA4B2")
-        public static let onAccentText = Color.dynamic(lightHex: "FFFFFF", darkHex: "FAF4EC")
+        public static let appBackground = Color.dynamic(lightHex: "FFF9FB", darkHex: "524C61") // as before
+
+        // Card/box surfaces: neutral but colored for accents
+        public static let cardSurface   = Color.dynamic(lightHex: "FFFFFF", darkHex: "231C18") // deep brown/earth for general cards
+        public static let cardStroke    = Color.dynamic(lightHex: "F2E9F0", darkHex: "493825")
+
+        // Accents (now truly deep and analogous to light mode)
+        public static let accentPink    = Color.dynamic(lightHex: "FF9ECD", darkHex: "91304D") // deep berry
+        public static let accentBlue    = Color.dynamic(lightHex: "A0D8F1", darkHex: "19324D") // dark blue
+        public static let accentMint    = Color.dynamic(lightHex: "98D8AA", darkHex: "284235") // deep pine
+        public static let accentPeach   = Color.dynamic(lightHex: "FFE5A0", darkHex: "6A4A1B") // rich brown/gold
+
+        // Text
+        public static let primaryText   = Color.dynamic(lightHex: "1C1D21", darkHex: "F4EFE7")
+        public static let secondaryText = Color.dynamic(lightHex: "6F6F80", darkHex: "C9C6BD")
+        public static let mutedText     = Color.dynamic(lightHex: "9C9DB0", darkHex: "837A8D")
+        public static let onAccentText  = Color.dynamic(lightHex: "FFFFFF", darkHex: "F7F4ED")
     }
 
     public enum Gradients {
-        public static let softBlue: [Color] = [
-            Color.dynamic(lightHex: "E8F4FF", darkHex: "737D92"),
-            Color.dynamic(lightHex: "F0F8FF", darkHex: "666D7D")
+        // Each card/box now has a dark mode color that matches the light mode's intent,
+        // but is rich and deep, not gray, not pastel:
+        public static let ownerCard: [Color] = [
+            Color.dynamic(lightHex: "FFE5EC", darkHex: "3A1A22"), // blush → deep wine
+            Color.dynamic(lightHex: "FFF0F5", darkHex: "231116")
         ]
-
-        public static let blush: [Color] = [
-            Color.dynamic(lightHex: "FFE5EC", darkHex: "AB8072"),
-            Color.dynamic(lightHex: "FFF0F5", darkHex: "8A8172")
+        public static let statusTile: [Color] = [
+            Color.dynamic(lightHex: "FFE5A0", darkHex: "6A4A1B"), // yellow → brown/gold
+            Color.dynamic(lightHex: "FFF3D4", darkHex: "3B2714")
         ]
-
-        public static let lavender: [Color] = [
-            Color.dynamic(lightHex: "FFE5F1", darkHex: "8A8172"),
-            Color.dynamic(lightHex: "FFF0F7", darkHex: "6D5F63")
+        public static let quickAction: [Color] = [
+            Color.dynamic(lightHex: "E8F4FF", darkHex: "19324D"), // blue → dark blue
+            Color.dynamic(lightHex: "F0F8FF", darkHex: "222A36")
         ]
-
-        public static let mint: [Color] = [
-            Color.dynamic(lightHex: "E8FFE8", darkHex: "A4B089"),
-            Color.dynamic(lightHex: "F0FFF0", darkHex: "7F8E6C")
+        public static let vaccineCard: [Color] = [
+            Color.dynamic(lightHex: "98D8AA", darkHex: "284235"), // mint/green → deep pine
+            Color.dynamic(lightHex: "E8FFE8", darkHex: "16251B")
         ]
-
-        public static let heroSunrise: [Color] = [
-            Color.dynamic(lightHex: "FFB5D8", darkHex: "B89A79"),
-            Color.dynamic(lightHex: "A0D8F1", darkHex: "666D7D")
+        public static let emergencyCard: [Color] = [
+            Color.dynamic(lightHex: "FF9ECD", darkHex: "91304D"), // pink → berry/burgundy
+            Color.dynamic(lightHex: "FFE5EC", darkHex: "4C1B2A")
+        ]
+        public static let heroCard: [Color] = [
+            Color.dynamic(lightHex: "A0D8F1", darkHex: "233042"), // blue → midnight blue
+            Color.dynamic(lightHex: "FFB5D8", darkHex: "3A2132")  // pink → dark wine
         ]
     }
 
