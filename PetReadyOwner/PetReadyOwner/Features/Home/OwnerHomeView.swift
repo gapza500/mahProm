@@ -217,11 +217,12 @@ struct OwnerSOSRequestView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 18) {
-                cuteCard("Where are you?", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(viewModel.locationSnapshot.title)
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 18) {
+                    cuteCard("Where are you?", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(viewModel.locationSnapshot.title)
                             .font(.headline)
                         Text(viewModel.locationSnapshot.subtitle)
                             .font(.caption)
@@ -265,10 +266,21 @@ struct OwnerSOSRequestView: View {
                 if let activeCase = viewModel.activeCase {
                     OwnerSOSConfirmationView(
                         caseItem: activeCase,
+                        initialCountdown: viewModel.countdownDuration,
                         onCancel: {
                             Task { await viewModel.cancelActiveCase() }
                         }
                     )
+                    NavigationLink(
+                        destination: OwnerSOSCaseDetailView(caseItem: Binding(
+                            get: { viewModel.activeCase },
+                            set: { viewModel.activeCase = $0 }
+                        )),
+                        isActive: $viewModel.navigateToCaseDetail
+                    ) {
+                        EmptyView()
+                    }
+                    .frame(width: 0, height: 0)
                 } else {
                     Button {
                         Task { await viewModel.send(requesterId: requesterId, petId: nil) }
@@ -294,16 +306,91 @@ struct OwnerSOSRequestView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .padding()
+                .padding()
+            }
+            .background(DesignSystem.Colors.appBackground)
+        }
+        .task { viewModel.start() }
+    }
+}
+
+struct OwnerSOSCaseDetailView: View {
+    @Binding var caseItem: SOSCase?
+
+    var body: some View {
+        ScrollView {
+            if let caseItem {
+                VStack(spacing: 16) {
+                    cuteCard("Case Status", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Status: \(caseItem.status.readableLabel)")
+                                .font(.headline)
+                            Text("Incident: \(caseItem.incidentType.readableLabel)")
+                                .font(.subheadline.weight(.semibold))
+                            if let rider = caseItem.riderId {
+                                Text("Assigned rider: \(rider.uuidString.prefix(6))")
+                                    .font(.caption)
+                                    .foregroundStyle(Color(hex: "A0D8F1"))
+                            } else {
+                                Text("Waiting for rider assignment")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    cuteCard("Locations", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(String(format: "Pickup: %.4f, %.4f", caseItem.pickup.latitude, caseItem.pickup.longitude))
+                                .font(.caption.weight(.semibold))
+                            if let dest = caseItem.destination {
+                                Text(String(format: "Destination: %.4f, %.4f", dest.latitude, dest.longitude))
+                                    .font(.caption.weight(.semibold))
+                            }
+                            if let beacon = caseItem.lastKnownLocation {
+                                Text(String(format: "Last beacon: %.4f, %.4f", beacon.latitude, beacon.longitude))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    cuteCard("Event Log", gradient: [Color(hex: "FFF9E5"), Color(hex: "FFFEF0")]) {
+                        if caseItem.events.isEmpty {
+                            Text("No events yet").font(.caption).foregroundStyle(.secondary)
+                        } else {
+                            ForEach(caseItem.events.suffix(10)) { event in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(event.message)
+                                        .font(.caption.weight(.semibold))
+                                    Text("\(event.actor) • \(event.timestamp.formatted())")
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                                if event.id != caseItem.events.last?.id {
+                                    Divider().padding(.leading, 8)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding()
+            } else {
+                Text("SOS case no longer available.")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding()
+            }
         }
         .background(DesignSystem.Colors.appBackground)
-        .task { viewModel.start() }
+        .navigationTitle("SOS Case")
     }
 }
 
 struct OwnerSOSConfirmationView: View {
     let caseItem: SOSCase
     let onCancel: () -> Void
+    let initialCountdown: Int
 
     @State private var countdown: Int = 20
     @State private var isCancelling = false
@@ -389,6 +476,7 @@ struct OwnerSOSConfirmationView: View {
                 .stroke(Color(hex: "FFB5D8").opacity(0.3), lineWidth: 1)
         )
         .onAppear {
+            countdown = initialCountdown
             countdownActive = allowAutoCancel
             tickDown()
         }
@@ -421,6 +509,8 @@ final class OwnerSOSViewModel: ObservableObject {
     @Published var locationSnapshot: LocationSnapshot
     @Published var isSending = false
     @Published var errorMessage: String?
+    @Published var countdownDuration: Int = 120
+    @Published var navigateToCaseDetail = false
 
     private let service: SOSServiceProtocol
     private let locationService: LocationServiceProtocol
@@ -452,6 +542,7 @@ final class OwnerSOSViewModel: ObservableObject {
         errorMessage = nil
 
         let attachments = includeMockMedia ? [URL(string: "https://example.com/mock-sos-photo.jpg")! ] : []
+        countdownDuration = countdownSeconds(for: priority)
         let request = SOSRequest(
             requesterId: requesterId,
             petId: petId,
@@ -469,6 +560,7 @@ final class OwnerSOSViewModel: ObservableObject {
             await MainActor.run {
                 self.activeCase = created
                 self.isSending = false
+                self.navigateToCaseDetail = true
             }
             pushService.scheduleLocalNotification(title: "SOS sent", body: "We’re dispatching help now.", timeInterval: 1)
         } catch {
@@ -499,13 +591,26 @@ final class OwnerSOSViewModel: ObservableObject {
         service.observeCases { [weak self] cases in
             guard let self, let activeId = self.activeCase?.id else { return }
             if let updated = cases.first(where: { $0.id == activeId }) {
-                Task { @MainActor in self.activeCase = updated }
+                Task { @MainActor in
+                    self.activeCase = updated
+                    if updated.status == .assigned || updated.status == .enRoute {
+                        self.navigateToCaseDetail = true
+                    }
+                }
             }
         }
     }
 
     deinit {
         locationTask?.cancel()
+    }
+
+    private func countdownSeconds(for priority: SOSPriority) -> Int {
+        switch priority {
+        case .routine: return 180
+        case .urgent: return 120
+        case .critical: return 60
+        }
     }
 }
 
