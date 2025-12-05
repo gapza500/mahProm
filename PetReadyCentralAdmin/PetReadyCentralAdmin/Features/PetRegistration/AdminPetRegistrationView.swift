@@ -52,7 +52,7 @@ final class AdminPetRegistrationViewModel: ObservableObject {
 
         let weight = Double(weightText.replacingOccurrences(of: ",", with: "."))
 
-        var pet = Pet(
+        let pet = Pet(
             ownerId: ownerUuid,
             species: species,
             breed: breed,
@@ -71,7 +71,7 @@ final class AdminPetRegistrationViewModel: ObservableObject {
         await MainActor.run { isSaving = true }
         do {
             try await petService.addPet(pet)
-            _ = try barcodeService.claim(code: barcode, for: pet)
+            _ = try await barcodeService.claim(code: barcode, for: pet)
             await MainActor.run {
                 statusMessage = "Pet registration saved. Share barcode \(barcode) with the owner."
                 isSaving = false
