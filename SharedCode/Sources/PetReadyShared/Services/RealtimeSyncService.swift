@@ -6,11 +6,11 @@ public struct LiveEvent: Identifiable, Sendable {
     public let timestamp: Date
 }
 
-public protocol RealtimeSyncServiceProtocol: AnyObject {
+public protocol RealtimeSyncServiceProtocol: AnyObject, Sendable {
     func subscribe(to channel: String) async -> AsyncStream<LiveEvent>
 }
 
-public final class RealtimeSyncService: NSObject, RealtimeSyncServiceProtocol {
+public final class RealtimeSyncService: NSObject, RealtimeSyncServiceProtocol, @unchecked Sendable {
     private let socket: SocketConnection?
     private var continuationBuckets: [String: [UUID: AsyncStream<LiveEvent>.Continuation]] = [:]
 
