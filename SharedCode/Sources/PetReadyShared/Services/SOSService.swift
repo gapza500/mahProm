@@ -14,7 +14,7 @@ public enum SOSServiceError: LocalizedError {
     }
 }
 
-public protocol SOSServiceProtocol: AnyObject {
+public protocol SOSServiceProtocol: AnyObject, Sendable {
     func createCase(_ request: SOSRequest) async throws -> SOSCase
     func fetchCases() async -> [SOSCase]
     func observeCases(update: @escaping ([SOSCase]) -> Void)
@@ -26,7 +26,7 @@ public protocol SOSServiceProtocol: AnyObject {
     func recordBeacon(id: UUID, coordinate: Coordinate, note: String?) async
 }
 
-public final class SOSService: SOSServiceProtocol {
+public final class SOSService: SOSServiceProtocol, @unchecked Sendable {
     public static let shared = SOSService()
     private let queue = DispatchQueue(label: "com.petready.sos.service", qos: .userInitiated, attributes: .concurrent)
     private var cases: [UUID: SOSCase] = [:]
@@ -64,7 +64,7 @@ public final class SOSService: SOSServiceProtocol {
     }
 
     public func cancelCase(id: UUID, reason: String?) async throws -> SOSCase {
-        try await mutateCase(id: id, allowClosed: false) { item in
+        try await mutateCase(id: id, allowClosed: false) { [self] item in
             item.status = .cancelled
             let message: String
             if let reason, !reason.isEmpty {
@@ -72,49 +72,49 @@ public final class SOSService: SOSServiceProtocol {
             } else {
                 message = "SOS cancelled"
             }
-            appendEvent(message, actor: "owner", into: &item)
+            self.appendEvent(message, actor: "owner", into: &item)
         }
     }
 
     public func acceptCase(id: UUID, riderId: UUID) async throws -> SOSCase {
-        try await mutateCase(id: id, allowClosed: false) { item in
+        try await mutateCase(id: id, allowClosed: false) { [self] item in
             item.riderId = riderId
             item.status = .assigned
-            appendEvent("Assigned to rider \(riderId.uuidString.prefix(6))", actor: "rider", into: &item)
+            self.appendEvent("Assigned to rider \(riderId.uuidString.prefix(6))", actor: "rider", into: &item)
         }
     }
 
     public func declineCase(id: UUID, riderId: UUID) async {
-        _ = try? await mutateCase(id: id, allowClosed: true) { item in
+        _ = try? await mutateCase(id: id, allowClosed: true) { [self] item in
             if item.riderId == riderId {
                 item.riderId = nil
                 item.status = .pending
             }
-            appendEvent("Declined by rider \(riderId.uuidString.prefix(6))", actor: "rider", into: &item)
+            self.appendEvent("Declined by rider \(riderId.uuidString.prefix(6))", actor: "rider", into: &item)
         }
     }
 
     public func markEnRoute(id: UUID, riderId: UUID, etaMinutes: Int?, distanceKm: Double?) async throws -> SOSCase {
-        try await mutateCase(id: id, allowClosed: false) { item in
+        try await mutateCase(id: id, allowClosed: false) { [self] item in
             item.riderId = riderId
             item.status = .enRoute
             item.etaMinutes = etaMinutes
             item.distanceKm = distanceKm
-            appendEvent("Rider en route (ETA \(etaMinutes.map { "\($0)m" } ?? "—"))", actor: "rider", into: &item)
+            self.appendEvent("Rider en route (ETA \(etaMinutes.map { "\($0)m" } ?? "—"))", actor: "rider", into: &item)
         }
     }
 
     public func completeCase(id: UUID) async throws -> SOSCase {
-        try await mutateCase(id: id, allowClosed: false) { item in
+        try await mutateCase(id: id, allowClosed: false) { [self] item in
             item.status = .completed
-            appendEvent("Marked as completed", actor: "admin", into: &item)
+            self.appendEvent("Marked as completed", actor: "admin", into: &item)
         }
     }
 
     public func recordBeacon(id: UUID, coordinate: Coordinate, note: String?) async {
-        _ = try? await mutateCase(id: id, allowClosed: true) { item in
+        _ = try? await mutateCase(id: id, allowClosed: true) { [self] item in
             item.lastKnownLocation = coordinate
-            appendEvent("Beacon \(coordinate.latitude),\(coordinate.longitude)\(note.map { " – \($0)" } ?? "")", actor: "rider", into: &item)
+            self.appendEvent("Beacon \(coordinate.latitude),\(coordinate.longitude)\(note.map { " – \($0)" } ?? "")", actor: "rider", into: &item)
         }
     }
 
