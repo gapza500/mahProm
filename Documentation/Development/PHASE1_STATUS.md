@@ -16,7 +16,9 @@
 | Integration Tests | ✅ | Added `IntegrationTestHelpers` in SharedCode tests (placeholder cross-app harness). |
 | Firebase Bootstrap | ✅ | Added `AppBootstrap.configureFirebaseIfNeeded()` and wired each app to call `FirebaseApp.configure()` on launch. |
 | CloudKit Toggle | ✅ | CentralAdmin now skips CloudKit unless `ENABLE_CLOUDKIT=1` is set (avoids entitlement errors when using Firebase-only setup). |
-| Dark Appearance Plan | ⏳ | TBD: document how each app will ensure dark-mode parity (colors, assets, testing checklist). |
+| Dark Appearance Plan | 🚧 | Moved to Phase 3 final UX polish (see README) |
+| Base Infrastructure Stubs | ✅ | Added shared `LocationService`, `RealtimeSyncService`, `PushNotificationService`, plus `InfrastructurePreviewView` so each app can surface GPS/realtime/push readiness from settings. |
+| Navigation Placeholders | ✅ | Owner/Rider/Vet/Admin screens now push `FeaturePlaceholderView` destinations + filter sheets (OwnerClinicFilterView, RiderJobFilterView) so every chevron leads to a full-page mock. |
 
 ## Technical Validation Snapshot
 

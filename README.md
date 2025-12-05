@@ -240,10 +240,10 @@ _TL;DR_: seed the profile doc + claim, use the new login UI per app, approve fro
 
 ---
 
-## Dark Appearance Support (upcoming)
-- **Design parity**: All color tokens and gradients will be defined in SharedCode so both light/dark modes stay in sync.
-- **Testing**: Each app will get a “Dark Mode QA” checklist before release (UI previews + simulator snapshots).
-- **Docs**: The plan lives in `Documentation/Development/PHASE1_STATUS.md` (see “Dark Appearance Plan” row) and will expand as Phase 2 kicks off.
+## Dark Appearance (Phase 3)
+- **Status**: Deferred until Phase 3’s “Final Design & UX Polish” milestone so we can address it holistically.
+- **Plan** (Phase 3): Expand the design system with dark-specific gradients, update all feature cards, and add a QA checklist before release.
+- **Tracker**: See the “Dark Appearance Plan” row in `Documentation/Development/PHASE1_STATUS.md` and the Phase 3 roadmap entry below.
 
 ---
 
@@ -352,9 +352,9 @@ PetReady-Ecosystem/
 - **Goal**: Central admin functionality, government announcements, professional verification, problem resolution
 - **Success Criteria**: 99.9% announcement uptime, admin approval workflows functional, cross-app problem resolution works
 
-### **Milestone 6: Production Readiness** (Weeks 16-18)
-- **Goal**: Comprehensive testing, performance optimization, deployment preparation
-- **Success Criteria**: All cross-app features work reliably, security validation passes, apps ready for App Store submission
+### **Milestone 6: Final Design & UX Polish** (Weeks 16-18)
+- **Goal**: Finalize dark appearance and overall UX, prepare marketing assets, and run final design QA.
+- **Success Criteria**: Dark mode matches the approved palette in all apps, typography/accessibility pass audits, and launch assets are ready for App Store submission.
 
 ### **Performance Benchmarks:**
 - **App Launch**: <2 seconds for all apps
@@ -368,7 +368,7 @@ PetReady-Ecosystem/
 ---
 
 ## Next Steps
-1. **Dark appearance rollout** — Finish the plan called out in `Documentation/Development/PHASE1_STATUS.md`, migrate remaining custom colors to `DesignSystem`, and verify every app in dark mode.
+1. **Dark appearance rollout** — Deferred to Phase 3 “Final Design & UX Polish”; focus now is infrastructure + CI.
 2. **Infrastructure wiring** — Replace the mock GPS/realtime/push stubs with live services (Firebase, sockets, APNs) so `InfrastructurePreviewView` reflects real data.
 3. **CI + builds** — Bring up Fastlane/TestFlight for the four targets so QA can install Phase 1 builds without Xcode.
 
