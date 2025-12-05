@@ -5,6 +5,7 @@ struct AdminDashboardScreen: View {
     @StateObject private var viewModel = AdminDependencies.shared.petListViewModel
     @State private var didTriggerInitialLoad = false
     @State private var isLoading = true
+    @State private var isShowingPetRegistration = false
 
     var body: some View {
         NavigationStack {
@@ -32,6 +33,13 @@ struct AdminDashboardScreen: View {
             .background(DesignSystem.Colors.appBackground)
             .navigationTitle("Pet Care Central")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        isShowingPetRegistration = true
+                    } label: {
+                        Label("New Pet", systemImage: "plus")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {} label: {
                         HStack(spacing: 6) {
@@ -50,6 +58,11 @@ struct AdminDashboardScreen: View {
                 }
             }
             .task { await reloadIfNeeded() }
+            .sheet(isPresented: $isShowingPetRegistration, onDismiss: {
+                Task { await reload() }
+            }) {
+                NavigationStack { AdminPetRegistrationView() }
+            }
         }
     }
 
