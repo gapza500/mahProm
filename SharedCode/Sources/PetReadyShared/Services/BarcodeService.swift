@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 public final class BarcodeService {
     private let validator = BarcodeValidator()
 

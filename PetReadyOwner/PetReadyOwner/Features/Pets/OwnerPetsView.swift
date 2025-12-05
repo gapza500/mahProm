@@ -4,31 +4,42 @@ import PetReadyShared
 struct OwnerPetsView: View {
     @State private var showScanner = false
     @State private var showManual = false
+    @ObservedObject private var identityStore = OwnerIdentityStore.shared
+    @StateObject private var viewModel = PetListViewModel(service: PetService(repository: PetRepositoryFactory.makeRepository()))
+
+    private var ownedPets: [Pet] {
+        viewModel.pets.filter { $0.ownerId == identityStore.ownerId }
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
-                    ForEach(0..<5, id: \.self) { index in
-                        NavigationLink {
-                            FeaturePlaceholderView(
-                                title: "Pet Profile",
-                                message: "Mock screen showing how full medical history, QR exports and GPS breadcrumbs will live for each pet.",
-                                icon: "🐾",
-                                highlights: [
-                                    "Vaccination + reminders timeline",
-                                    "Shareable health card & QR export"
-                                ]
-                            )
-                            .navigationTitle("Fluffy \(index + 1)")
-                        } label: {
-                            petCard(name: "Fluffy \(index + 1)", type: "Dog", age: "\(index + 1) years old")
+                    if ownedPets.isEmpty {
+                        emptyState
+                    } else {
+                        ForEach(ownedPets) { pet in
+                            NavigationLink {
+                                FeaturePlaceholderView(
+                                    title: pet.name,
+                                    message: "Pet detail will surface timeline, reminders and QR exports.",
+                                    icon: "🐾",
+                                    highlights: [
+                                        "Species: \(pet.species.rawValue.capitalized)",
+                                        "Status: \(formattedStatus(pet.status))"
+                                    ]
+                                )
+                                .navigationTitle(pet.name)
+                            } label: {
+                                petCard(name: pet.name, type: pet.species.rawValue.capitalized, status: formattedStatus(pet.status))
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
                 .padding()
             }
+            .refreshable { await viewModel.loadPets() }
             .background(DesignSystem.Colors.appBackground)
             .navigationTitle("My Pets")
             .toolbar {
@@ -63,11 +74,35 @@ struct OwnerPetsView: View {
             NavigationStack { PetScanPlaceholderView() }
         }
         .sheet(isPresented: $showManual) {
-            NavigationStack { BarcodeClaimView() }
+            NavigationStack {
+                BarcodeClaimView { _ in
+                    showManual = false
+                    Task { await viewModel.loadPets() }
+                }
+            }
         }
+        .task { await viewModel.loadPets() }
     }
 
-    private func petCard(name: String, type: String, age: String) -> some View {
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Text("No pets yet")
+                .font(.title3.bold())
+            Text("Ask Central Admin for your barcode, then scan or enter it here to link your pet.")
+                .font(.callout)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.08), radius: 10, y: 6)
+        )
+    }
+
+    private func petCard(name: String, type: String, status: String) -> some View {
         HStack(spacing: 16) {
             Text(type == "Dog" ? "🐶" : "🐱")
                 .font(.system(size: 44))
@@ -95,7 +130,7 @@ struct OwnerPetsView: View {
                         .padding(.vertical, 4)
                         .background(Color(hex: "A0D8F1"), in: Capsule())
 
-                    Text(age)
+                    Text(status)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -128,5 +163,9 @@ struct OwnerPetsView: View {
                 .stroke(Color(hex: "FFB5D8").opacity(0.2), lineWidth: 2)
         )
         .shadow(color: Color(hex: "FFB5D8").opacity(0.15), radius: 12, y: 6)
+    }
+
+    private func formattedStatus(_ status: String) -> String {
+        status.replacingOccurrences(of: "_", with: " ").capitalized
     }
 }

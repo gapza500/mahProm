@@ -83,11 +83,11 @@ public struct User: Identifiable, Codable, Equatable {
     }
 }
 
-public struct Pet: Identifiable, Codable, Equatable {
+public struct Pet: Identifiable, Codable, Equatable, Sendable {
     public enum Species: String, Codable { case dog, cat, rabbit, bird, other }
 
     public let id: UUID
-    public var ownerId: UUID
+    public var ownerId: UUID?
     public var species: Species
     public var breed: String
     public var name: String
@@ -103,7 +103,7 @@ public struct Pet: Identifiable, Codable, Equatable {
 
     public init(
         id: UUID = UUID(),
-        ownerId: UUID,
+        ownerId: UUID? = nil,
         species: Species,
         breed: String = "",
         name: String,

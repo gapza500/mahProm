@@ -1,13 +1,37 @@
 import SwiftUI
 import PetReadyShared
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct OwnerSettingsView: View {
     @EnvironmentObject var authService: AuthService
+    @ObservedObject private var identityStore = OwnerIdentityStore.shared
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
+                    cuteCard("Owner ID", gradient: [Color(hex: "E8F0FF"), Color(hex: "F5F8FF")]) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text("Share this code with clinics")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text(identityStore.ownerIdString)
+                                    .font(.system(.body, design: .monospaced).bold())
+                                    .textSelection(.enabled)
+                            }
+                            Spacer()
+                            Button {
+                                UIPasteboard.general.string = identityStore.ownerIdString
+                            } label: {
+                                Label("Copy", systemImage: "doc.on.doc")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    }
+
                     cuteCard("Account", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
                         NavigationLink {
                             FeaturePlaceholderView(

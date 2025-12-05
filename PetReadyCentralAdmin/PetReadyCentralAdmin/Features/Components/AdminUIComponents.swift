@@ -141,15 +141,22 @@ struct PetRegistrationsTable: View {
                 }
             }
             Spacer()
-            Text(pet.ownerId.uuidString.prefix(6) + "…")
-                .font(.caption)
-                .frame(width: 100, alignment: .leading)
-                .lineLimit(1)
+            Group {
+                if let ownerId = pet.ownerId {
+                    Text(ownerId.uuidString.prefix(6) + "…")
+                } else {
+                    Text("Unassigned")
+                }
+            }
+            .font(.caption)
+            .frame(width: 100, alignment: .leading)
+            .foregroundStyle(pet.ownerId == nil ? DesignSystem.Colors.secondaryText : .primary)
+            .lineLimit(1)
             Text(pet.species.rawValue.capitalized)
                 .font(.caption)
                 .frame(width: 80, alignment: .leading)
                 .lineLimit(1)
-            Text(pet.status.capitalized)
+            Text(statusLabel(for: pet.status))
                 .font(.caption)
                 .frame(width: 80, alignment: .leading)
                 .lineLimit(1)
@@ -161,4 +168,10 @@ struct PetRegistrationsTable: View {
         .padding(.horizontal, 4)
         .padding(.vertical, 10)
     }
+}
+
+private func statusLabel(for status: String) -> String {
+    status
+        .replacingOccurrences(of: "_", with: " ")
+        .capitalized
 }

@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 public final class PetListViewModel: ObservableObject {
     @Published public private(set) var pets: [Pet] = []
     private let service: PetServiceProtocol
@@ -8,7 +9,6 @@ public final class PetListViewModel: ObservableObject {
         self.service = service
     }
 
-    @MainActor
     public func loadPets() async {
         do {
             pets = try await service.loadPets()

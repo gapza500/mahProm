@@ -5,6 +5,7 @@ import PetReadyShared
 import UIKit
 #endif
 
+@MainActor
 final class AdminPetRegistrationViewModel: ObservableObject {
     @Published var ownerIdText: String = ""
     @Published var petName: String = ""
@@ -37,9 +38,14 @@ final class AdminPetRegistrationViewModel: ObservableObject {
     }
 
     func savePet() async {
-        guard let ownerUuid = UUID(uuidString: ownerIdText.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-            await MainActor.run { statusMessage = "Owner ID must be a valid UUID." }
-            return
+        let trimmedOwnerId = ownerIdText.trimmingCharacters(in: .whitespacesAndNewlines)
+        var ownerUuid: UUID?
+        if !trimmedOwnerId.isEmpty {
+            guard let parsed = UUID(uuidString: trimmedOwnerId) else {
+                await MainActor.run { statusMessage = "Owner ID must be a valid UUID or left blank." }
+                return
+            }
+            ownerUuid = parsed
         }
         guard !petName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             await MainActor.run { statusMessage = "Enter the pet name." }
@@ -52,6 +58,8 @@ final class AdminPetRegistrationViewModel: ObservableObject {
 
         let weight = Double(weightText.replacingOccurrences(of: ",", with: "."))
 
+        let statusValue = ownerUuid == nil ? "awaiting_claim" : "pending_owner_sync"
+
         let pet = Pet(
             ownerId: ownerUuid,
             species: species,
@@ -62,7 +70,7 @@ final class AdminPetRegistrationViewModel: ObservableObject {
             weight: weight,
             barcodeId: barcode,
             microchipCode: nil,
-            status: "pending",
+            status: statusValue,
             updatedAt: Date(),
             syncedAt: nil,
             isDirty: false
@@ -73,7 +81,10 @@ final class AdminPetRegistrationViewModel: ObservableObject {
             try await petService.addPet(pet)
             _ = try await barcodeService.claim(code: barcode, for: pet)
             await MainActor.run {
-                statusMessage = "Pet registration saved. Share barcode \(barcode) with the owner."
+                let ownerNote = ownerUuid == nil
+                    ? "Pet is unassigned until an owner scans the barcode."
+                    : "Share barcode \(barcode) with the owner."
+                statusMessage = "Pet registration saved. \(ownerNote)"
                 isSaving = false
             }
         } catch {
@@ -91,11 +102,11 @@ struct AdminPetRegistrationView: View {
 
     var body: some View {
         Form {
-            Section("Owner") {
+            Section("Owner (optional)") {
                 TextField("Owner UUID", text: $viewModel.ownerIdText)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.asciiCapable)
-                Text("Ask the owner to open Settings → Profile to copy their ID.")
+                Text("Leave blank for unassigned pets. Ask the owner to open Settings → Profile to copy their ID once available.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -372,6 +372,22 @@ PetReady-Ecosystem/
 2. **Phase 2 backlog** — See [`Documentation/Development/PHASE2_KICKOFF.md`](Documentation/Development/PHASE2_KICKOFF.md) for the split between Owner feature work (barcode, health timeline, clinics) and Government service integration.
 3. **CI + builds** — Bring up Fastlane/TestFlight once the professor gives the green light; until then, local builds + Firebase backends are sufficient.
 
+### SOS & Rider System Focus (current sprint)
+1. **Owner SOS Request Flow**
+   - Build the SOS entry screen in the Owner app that captures location, incident type, and optional media.
+   - Persist requests via `SOSService` (Firestore placeholder now, backend API later) and surface confirmation states plus cancel timers.
+   - Tie into `PushNotificationService` to acknowledge dispatch updates in real time.
+2. **Rider Intake & Dispatch**
+   - Implement a live “Available Jobs” queue in the Rider app backed by the same SOS data.
+   - Show job detail (pickup/drop-off, pet profile, urgency) and accept/decline actions that update the shared record.
+   - Wire the existing `LocationService` stub so the Rider map reflects active missions and broadcasts periodic GPS beacons.
+3. **Central Admin Coordination**
+   - Extend the Central Admin dashboard with an SOS monitor card highlighting active cases, assigned riders, and escalation status.
+   - Provide manual reassignment/override tools plus a lightweight event log (using `RealtimeSyncService`) for auditing.
+4. **Shared Infrastructure Hardening**
+   - Finalize the `SOSCase` schema (status enums, timestamps, rider references) and document it under `Documentation/Specs/`.
+   - Add integration tests around `SOSService` and Rider job flows to prevent regression as we layer on realtime sync + push.
+
 ## Documentation Map
 - **Root index**: [`Documentation/README.md`](Documentation/README.md) summarizes every doc set.
 - **Architecture**: [`Documentation/Architecture/MULTI_APP_STRUCTURE.md`](Documentation/Architecture/MULTI_APP_STRUCTURE.md) (folder tree) + other architecture notes.

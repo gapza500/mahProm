@@ -16,27 +16,49 @@ public struct PetListRow: View {
 }
 
 public struct BarcodeClaimView: View {
-    @State private var codeText: String = ""
-    @State private var statusMessage: String?
-    @State private var isSaving = false
-    private let validator = BarcodeValidator()
-    private let service = PetService(repository: PetRepositoryFactory.makeRepository())
+    @StateObject private var viewModel: BarcodeClaimViewModel
 
-    public init() {}
+    public init(
+        service: PetServiceProtocol? = nil,
+        identityStore: OwnerIdentityStore = .shared,
+        onPetClaimed: ((Pet) -> Void)? = nil
+    ) {
+        let resolvedService = service ?? PetService(repository: PetRepositoryFactory.makeRepository())
+        _viewModel = StateObject(
+            wrappedValue: BarcodeClaimViewModel(
+                service: resolvedService,
+                identityStore: identityStore,
+                onClaimed: onPetClaimed
+            )
+        )
+    }
 
     public var body: some View {
         Form {
             Section("Barcode ID") {
-                TextField("PET-XXXX-XXXXXX-XX", text: $codeText)
+                TextField("PET-XXXX-XXXXXX-XX", text: $viewModel.codeText)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
-                Button("Validate & Claim", action: validateAndSave)
-                    .disabled(isSaving)
-                if isSaving {
+                Button("Validate & Claim", action: viewModel.validateAndClaim)
+                    .disabled(viewModel.isSaving)
+                if viewModel.isSaving {
                     ProgressView().padding(.vertical, 4)
                 }
             }
-            if let statusMessage {
+            if let pet = viewModel.claimedPet {
+                Section("Linked Pet") {
+                    LabeledContent("Name", value: pet.name)
+                    LabeledContent("Species", value: pet.species.rawValue.capitalized)
+                    if let barcode = pet.barcodeId {
+                        LabeledContent("Barcode", value: barcode)
+                    }
+                    if let ownerId = pet.ownerId {
+                        LabeledContent("Owner UUID", value: ownerId.uuidString)
+                    }
+                    LabeledContent("Status", value: formattedStatus(pet.status))
+                }
+            }
+            if let statusMessage = viewModel.statusMessage {
                 Section("Status") {
                     Text(statusMessage)
                         .foregroundStyle(.secondary)
@@ -46,7 +68,31 @@ public struct BarcodeClaimView: View {
         .navigationTitle("Register via Barcode")
     }
 
-    private func validateAndSave() {
+}
+
+@MainActor
+public final class BarcodeClaimViewModel: ObservableObject {
+    @Published var codeText: String = ""
+    @Published var statusMessage: String?
+    @Published var isSaving = false
+    @Published var claimedPet: Pet?
+
+    private let validator = BarcodeValidator()
+    private let service: PetServiceProtocol
+    private let identityStore: OwnerIdentityStore
+    private let onClaimed: ((Pet) -> Void)?
+
+    public init(
+        service: PetServiceProtocol,
+        identityStore: OwnerIdentityStore,
+        onClaimed: ((Pet) -> Void)? = nil
+    ) {
+        self.service = service
+        self.identityStore = identityStore
+        self.onClaimed = onClaimed
+    }
+
+    func validateAndClaim() {
         let trimmed = codeText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             statusMessage = "Enter a code to continue."
@@ -55,10 +101,8 @@ public struct BarcodeClaimView: View {
 
         do {
             try validator.validate(trimmed)
-            statusMessage = "Code looks valid! Saving…"
-            Task {
-                await savePet(with: trimmed)
-            }
+            statusMessage = "Code looks valid! Linking to your pets…"
+            Task { await claimPet(with: trimmed.uppercased()) }
         } catch {
             if let error = error as? LocalizedError, let description = error.errorDescription {
                 statusMessage = "Invalid code: \(description)"
@@ -68,32 +112,28 @@ public struct BarcodeClaimView: View {
         }
     }
 
-    @MainActor
-    private func savePet(with code: String) async {
+    private func claimPet(with code: String) async {
         isSaving = true
+        claimedPet = nil
         defer { isSaving = false }
 
-        let pet = Pet(
-            ownerId: UUID(),
-            species: [.dog, .cat, .rabbit, .bird, .other].randomElement() ?? .other,
-            breed: "",
-            name: "Pet \(code.suffix(4))",
-            sex: "unknown",
-            dob: nil,
-            weight: nil,
-            barcodeId: code.uppercased(),
-            microchipCode: nil,
-            status: "pending",
-            updatedAt: Date(),
-            syncedAt: nil,
-            isDirty: false
-        )
-
         do {
-            try await service.addPet(pet)
-            statusMessage = "Saved! Check Central Admin dashboard for the new registration."
+            let ownerId = identityStore.ownerId
+            let updatedPet = try await service.claimPet(withBarcode: code, ownerId: ownerId)
+            claimedPet = updatedPet
+            statusMessage = "Success! \(updatedPet.name) is now linked to your account."
+            onClaimed?(updatedPet)
         } catch {
-            statusMessage = "Failed to save: \(error.localizedDescription)"
+            if let localized = error as? LocalizedError,
+               let description = localized.errorDescription {
+                statusMessage = description
+            } else {
+                statusMessage = error.localizedDescription
+            }
         }
     }
+}
+
+private func formattedStatus(_ status: String) -> String {
+    status.replacingOccurrences(of: "_", with: " ").capitalized
 }
