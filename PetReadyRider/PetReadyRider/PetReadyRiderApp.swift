@@ -30,6 +30,11 @@ struct PetReadyRiderApp: App {
 }
 
 final class RiderAppContext: ObservableObject {
-    let sosService = SOSService()
+    let sosService: SOSServiceProtocol
     let mapsService = MapsService()
+    let locationService = LocationService()
+
+    init(service: SOSServiceProtocol = SOSService.shared) {
+        self.sosService = service
+    }
 }
