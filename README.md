@@ -368,16 +368,16 @@ PetReady-Ecosystem/
 ---
 
 ## Next Steps
-1. **Dark appearance rollout** — Deferred to Phase 3 “Final Design & UX Polish”; focus now is infrastructure + CI.
-2. **Infrastructure wiring** — Replace the mock GPS/realtime/push stubs with live services (Firebase, sockets, APNs) so `InfrastructurePreviewView` reflects real data.
-3. **CI + builds** — Bring up Fastlane/TestFlight for the four targets so QA can install Phase 1 builds without Xcode.
+1. **Infrastructure wiring** — LocationService now requests live CoreLocation updates, PushNotificationService uses `UNUserNotificationCenter`, and RealtimeSyncService listens via the SocketConnection wrapper. Keep validating these services on-device as we plug them into feature work.
+2. **Phase 2 backlog** — See [`Documentation/Development/PHASE2_KICKOFF.md`](Documentation/Development/PHASE2_KICKOFF.md) for the split between Owner feature work (barcode, health timeline, clinics) and Government service integration.
+3. **CI + builds** — Bring up Fastlane/TestFlight once the professor gives the green light; until then, local builds + Firebase backends are sufficient.
 
 ## Documentation Map
 - **Root index**: [`Documentation/README.md`](Documentation/README.md) summarizes every doc set.
 - **Architecture**: [`Documentation/Architecture/MULTI_APP_STRUCTURE.md`](Documentation/Architecture/MULTI_APP_STRUCTURE.md) (folder tree) + other architecture notes.
 - **Specs & rules**: `Documentation/Specs/*.md`, `Documentation/Guidelines/*.md`.
 - **Navigation plan**: [`Documentation/Specs/navigation_plan.md`](Documentation/Specs/navigation_plan.md).
-- **Development guides**: `Documentation/Development/` (setup, phase plans, CloudKit/Firebase notes).
+- **Development guides**: `Documentation/Development/` (setup, phase plans, CloudKit/Firebase notes). See [`PHASE2_KICKOFF.md`](Documentation/Development/PHASE2_KICKOFF.md) for the current feature split.
 
 ---
 

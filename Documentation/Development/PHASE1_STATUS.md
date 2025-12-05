@@ -34,6 +34,6 @@
 
 ## Ready for Phase 2
 
-1. Wire Firebase (or CloudKit once available) into the repositories/services to replace the current in-memory/mock implementations.
-2. Flesh out the SwiftUI shells per app (tabs, coordinators) so barcode + health features have views to live in.
-3. Enable CI/CD (Fastlane/TestFlight) once Apple Developer access is available.
+1. Infrastructure wiring ✅ — Location/Realtime/Push services now point at real Apple APIs + the SocketConnection wrapper. Continue validating them on device.
+2. Feature backlog defined — see [`Documentation/Development/PHASE2_KICKOFF.md`](PHASE2_KICKOFF.md) for the Owner vs. Government split and individual story lists.
+3. CI/CD (Fastlane/TestFlight) remains pending approval from the professor; plan to enable it closer to Phase 3.

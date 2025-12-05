@@ -6,8 +6,10 @@ public struct InfrastructurePreviewView: View {
     private let realtimeService: RealtimeSyncServiceProtocol
 
     @State private var route: [LocationSnapshot] = []
+    @State private var liveSnapshot: LocationSnapshot?
     @State private var liveEvents: [LiveEvent] = []
     @State private var permissionState: PushPermissionState
+    @State private var locationStatus: String
 
     public init(
         locationService: LocationServiceProtocol = LocationService(),
@@ -18,13 +20,14 @@ public struct InfrastructurePreviewView: View {
         self.pushService = pushService
         self.realtimeService = realtimeService
         _permissionState = State(initialValue: pushService.permissionState)
+        _locationStatus = State(initialValue: locationService.authorizationStatusDescription)
     }
 
     public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 infrastructureCard(title: "Live GPS", icon: "location.circle.fill") {
-                    let snapshot = locationService.latestSnapshot()
+                    let snapshot = liveSnapshot ?? locationService.latestSnapshot()
                     VStack(alignment: .leading, spacing: 8) {
                         Text(snapshot.title)
                             .font(.headline)
@@ -33,6 +36,9 @@ public struct InfrastructurePreviewView: View {
                             .foregroundStyle(.secondary)
                         Text("Lat: \(String(format: "%.4f", snapshot.coordinate.latitude)), Lon: \(String(format: "%.4f", snapshot.coordinate.longitude))")
                             .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                        Text("Status: \(locationStatus)")
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -111,6 +117,15 @@ public struct InfrastructurePreviewView: View {
         .task {
             route = locationService.requestMockRoute()
             await startRealtimeDemo()
+        }
+        .task {
+            locationService.requestAuthorizationIfNeeded()
+            for await snapshot in locationService.locationUpdates() {
+                await MainActor.run {
+                    self.liveSnapshot = snapshot
+                    self.locationStatus = locationService.authorizationStatusDescription
+                }
+            }
         }
     }
 
