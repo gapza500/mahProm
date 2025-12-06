@@ -8,7 +8,7 @@ struct VetDashboardView: View {
                 VStack(spacing: 20) {
                     vetHeroCard
                     metricGrid
-                    queueCard
+                    queueCard 
                     quickActionsCard
                 }
                 .padding()
@@ -78,13 +78,17 @@ struct VetDashboardView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button("Join") {}
-                        .font(.caption.bold())
-                        .foregroundStyle(DesignSystem.Colors.onAccentText)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color(hex: "FF9ECD"), in: Capsule())
-                        .shadow(color: Color(hex: "FF9ECD").opacity(0.3), radius: 4, y: 2)
+                    
+                    // ✅ แก้ไข: เปลี่ยนเป็น NavigationLink ไปหน้าแชท
+                    NavigationLink(destination: VetChatView()) {
+                        Text("Join")
+                            .font(.caption.bold())
+                            .foregroundStyle(DesignSystem.Colors.onAccentText)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(Color(hex: "FF9ECD"), in: Capsule())
+                            .shadow(color: Color(hex: "FF9ECD").opacity(0.3), radius: 4, y: 2)
+                    }
                 }
                 .padding(.vertical, 6)
                 if idx < 2 { Divider() }

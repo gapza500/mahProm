@@ -1,27 +1,72 @@
 import SwiftUI
-import PetReadyShared
 
 struct QueueMonitorView: View {
+    // ข้อมูลจำลอง (คนไข้ที่รออยู่)
+    struct QueueItem: Identifiable {
+        let id = UUID()
+        let ownerName: String
+        let petName: String
+        let symptom: String
+        let waitTime: String
+    }
+    
+    let waitingList = [
+        QueueItem(ownerName: "คุณสมศรี", petName: "น้องมอมแมม", symptom: "อาเจียน ไม่กินอาหาร", waitTime: "2 นาที"),
+        QueueItem(ownerName: "คุณสมชาย", petName: "เจ้าด่าง", symptom: "ขาเจ็บ เดินกะเผลก", waitTime: "5 นาที")
+    ]
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 18) {
-                    vetCuteCard("Waiting", gradient: [Color(hex: "FFE5A0").opacity(0.2), Color.white]) {
-                        ForEach(0..<3, id: \.self) { idx in
-                            vetCuteInfoRow(icon: "⏳", title: "Owner #\(idx + 312)", subtitle: "Waiting 3m • Auto-escalate in 12m")
-                            if idx < 2 { Divider().padding(.leading, 50) }
-                        }
+            List(waitingList) { item in
+                VStack(alignment: .leading, spacing: 12) {
+                    // หัวข้อ
+                    HStack {
+                        Image(systemName: "pawprint.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.orange)
+                        Text(item.petName)
+                            .font(.headline)
+                        Text("(\(item.ownerName))")
+                            .foregroundColor(.gray)
+                        Spacer()
+                        Text(item.waitTime)
+                            .font(.caption)
+                            .foregroundColor(.red)
+                            .padding(6)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(8)
                     }
-                    vetCuteCard("Completed", gradient: [Color(hex: "98D8AA").opacity(0.2), Color.white]) {
-                        ForEach(0..<2, id: \.self) { idx in
-                            vetCuteInfoRow(icon: "✅", title: "Case #\(idx + 123)", subtitle: "Resolved successfully")
+                    
+                    Text("อาการ: \(item.symptom)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                    
+                    Divider()
+                    
+                    
+                    NavigationLink(destination: VetChatView()) {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "video.fill")
+                            Text("รับเคส / เริ่มตรวจ (Start Consult)")
+                                .fontWeight(.bold)
+                            Spacer()
                         }
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                     }
                 }
-                .padding()
+                .padding(.vertical, 8)
             }
-            .background(DesignSystem.Colors.appBackground)
-            .navigationTitle("Queue")
+            .navigationTitle("คิวรอตรวจ (Waiting Queue)")
         }
+    }
+}
+
+struct QueueMonitorView_Previews: PreviewProvider {
+    static var previews: some View {
+        QueueMonitorView()
     }
 }
