@@ -94,11 +94,74 @@ struct VetDashboardView: View {
 
     private var quickActionsCard: some View {
         vetCuteCard("Quick Actions", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
+            NavigationLink {
+                ClinicAppointmentsView()
+            } label: {
+                vetCuteActionRow(icon: "🗓️", title: "Appointments", subtitle: "Approve requests", showChevron: true)
+            }
+            Divider().padding(.leading, 50)
+            NavigationLink {
+                ClinicAnnouncementsView()
+            } label: {
+                vetCuteActionRow(icon: "📢", title: "Announcements", subtitle: "Clinic-targeted alerts", showChevron: true)
+            }
+            Divider().padding(.leading, 50)
             vetCuteActionRow(icon: "💬", title: "Tele-chat room", subtitle: "Reply instantly", showChevron: true)
             Divider().padding(.leading, 50)
             vetCuteActionRow(icon: "💊", title: "Prescription", subtitle: "Send PDF/Photo", showChevron: true)
             Divider().padding(.leading, 50)
             vetCuteActionRow(icon: "📹", title: "Video Handoff", subtitle: "Switch to video", badge: "Pro", badgeColor: Color(hex: "98D8AA"), showChevron: true)
+        }
+    }
+}
+
+struct ClinicAnnouncementsView: View {
+    @State private var announcements: [GovernmentAnnouncement] = []
+    @State private var isLoading = false
+
+    private let service: AnnouncementServiceProtocol = AnnouncementService.shared
+    private let clinicStore: ClinicIdentityStore = .shared
+
+    var body: some View {
+        List {
+            Section("Targeted to this clinic") {
+                if clinicStore.clinicId == nil {
+                    Text("Set your clinic ID in ClinicIdentityStore to see targeted alerts.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else if announcements.isEmpty {
+                    if isLoading {
+                        ProgressView("Loading…")
+                    } else {
+                        Text("No announcements yet.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    ForEach(announcements) { item in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(item.title).font(.headline)
+                            Text(item.content).font(.caption).foregroundStyle(.secondary)
+                            Text(item.publishedAt.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 6)
+                    }
+                }
+            }
+        }
+        .navigationTitle("Clinic Alerts")
+        .task { await load() }
+    }
+
+    private func load() async {
+        guard let clinicId = clinicStore.clinicId else { return }
+        await MainActor.run { isLoading = true }
+        let items = await service.fetchAnnouncements(clinicId: clinicId)
+        await MainActor.run {
+            announcements = items
+            isLoading = false
         }
     }
 }

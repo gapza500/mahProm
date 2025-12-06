@@ -10,6 +10,20 @@ public struct Coordinate: Codable, Equatable, Sendable {
     }
 }
 
+public extension Coordinate {
+    func distanceKm(to other: Coordinate) -> Double {
+        let earthRadius = 6371.0
+        let dLat = (other.latitude - latitude) * .pi / 180
+        let dLon = (other.longitude - longitude) * .pi / 180
+        let a = sin(dLat / 2) * sin(dLat / 2) +
+            cos(latitude * .pi / 180) *
+            cos(other.latitude * .pi / 180) *
+            sin(dLon / 2) * sin(dLon / 2)
+        let c = 2 * atan2(sqrt(a), sqrt(1 - a))
+        return earthRadius * c
+    }
+}
+
 public enum UserType: String, Codable {
     case owner, vet, clinic, admin, rider, tester
 }
@@ -196,6 +210,46 @@ public struct VaccineRecord: Identifiable, Codable {
     }
 }
 
+public struct TreatmentRecord: Identifiable, Codable, Sendable {
+    public let id: UUID
+    public var petId: UUID
+    public var clinicId: UUID?
+    public var vetId: UUID?
+    public var title: String
+    public var detail: String
+    public var performedAt: Date
+    public var followUpDate: Date?
+    public var updatedAt: Date
+    public var syncedAt: Date?
+    public var isDirty: Bool
+
+    public init(
+        id: UUID = UUID(),
+        petId: UUID,
+        clinicId: UUID? = nil,
+        vetId: UUID? = nil,
+        title: String,
+        detail: String,
+        performedAt: Date = Date(),
+        followUpDate: Date? = nil,
+        updatedAt: Date = Date(),
+        syncedAt: Date? = nil,
+        isDirty: Bool = false
+    ) {
+        self.id = id
+        self.petId = petId
+        self.clinicId = clinicId
+        self.vetId = vetId
+        self.title = title
+        self.detail = detail
+        self.performedAt = performedAt
+        self.followUpDate = followUpDate
+        self.updatedAt = updatedAt
+        self.syncedAt = syncedAt
+        self.isDirty = isDirty
+    }
+}
+
 public struct Reminder: Identifiable, Codable {
     public let id: UUID
     public var petId: UUID
@@ -208,22 +262,133 @@ public struct Reminder: Identifiable, Codable {
     public var isDirty: Bool
 }
 
-public struct Clinic: Identifiable, Codable {
+public struct Clinic: Identifiable, Codable, Sendable, Hashable {
     public let id: UUID
     public var name: String
     public var address: String
     public var coordinate: Coordinate
-    public var servicesJSON: String
-    public var operatingHours: String
+    public var specialty: String?
+    public var rating: Double?
+    public var reviewCount: Int?
+    public var services: [String]?
+    public var operatingHours: String?
     public var verificationStatus: String
+    public var phone: String?
+    public var email: String?
+    public var website: String?
+    public var distanceKm: Double?
+
+    public init(
+        id: UUID = UUID(),
+        name: String,
+        address: String,
+        coordinate: Coordinate,
+        specialty: String? = nil,
+        rating: Double? = nil,
+        reviewCount: Int? = nil,
+        services: [String]? = nil,
+        operatingHours: String? = nil,
+        verificationStatus: String = "pending",
+        phone: String? = nil,
+        email: String? = nil,
+        website: String? = nil,
+        distanceKm: Double? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.address = address
+        self.coordinate = coordinate
+        self.specialty = specialty
+        self.rating = rating
+        self.reviewCount = reviewCount
+        self.services = services
+        self.operatingHours = operatingHours
+        self.verificationStatus = verificationStatus
+        self.phone = phone
+        self.email = email
+        self.website = website
+        self.distanceKm = distanceKm
+    }
 }
 
-public struct Appointment: Identifiable, Codable {
+public enum AppointmentStatus: String, Codable, CaseIterable, Sendable {
+    case pending
+    case approved
+    case declined
+    case completed
+    case cancelled
+
+    public var readableLabel: String {
+        switch self {
+        case .pending: return "Pending"
+        case .approved: return "Approved"
+        case .declined: return "Declined"
+        case .completed: return "Completed"
+        case .cancelled: return "Cancelled"
+        }
+    }
+}
+
+public struct Appointment: Identifiable, Codable, Sendable {
     public let id: UUID
-    public var petId: UUID
+    public var ownerId: UUID
+    public var petId: UUID?
     public var clinicId: UUID
     public var date: Date
-    public var status: String
+    public var status: AppointmentStatus
+    public var reason: String?
+    public var notes: String?
+    public var createdAt: Date
+    public var updatedAt: Date
+
+    public init(
+        id: UUID = UUID(),
+        ownerId: UUID,
+        petId: UUID? = nil,
+        clinicId: UUID,
+        date: Date,
+        status: AppointmentStatus = .pending,
+        reason: String? = nil,
+        notes: String? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.ownerId = ownerId
+        self.petId = petId
+        self.clinicId = clinicId
+        self.date = date
+        self.status = status
+        self.reason = reason
+        self.notes = notes
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+public struct AppointmentRequest: Sendable {
+    public var ownerId: UUID
+    public var petId: UUID?
+    public var clinicId: UUID
+    public var requestedDate: Date
+    public var reason: String?
+    public var notes: String?
+
+    public init(
+        ownerId: UUID,
+        petId: UUID? = nil,
+        clinicId: UUID,
+        requestedDate: Date,
+        reason: String? = nil,
+        notes: String? = nil
+    ) {
+        self.ownerId = ownerId
+        self.petId = petId
+        self.clinicId = clinicId
+        self.requestedDate = requestedDate
+        self.reason = reason
+        self.notes = notes
+    }
 }
 
 public struct Conversation: Identifiable, Codable {
@@ -292,6 +457,14 @@ public enum SOSPriority: String, Codable, CaseIterable, Sendable {
     case routine
     case urgent
     case critical
+
+    public var readableLabel: String {
+        switch self {
+        case .routine: return "Routine"
+        case .urgent: return "Urgent"
+        case .critical: return "Critical"
+        }
+    }
 }
 
 public enum SOSStatus: String, Codable, CaseIterable, Sendable {
@@ -310,6 +483,7 @@ public struct SOSCase: Identifiable, Codable, Equatable, Sendable {
     public var requesterId: UUID
     public var riderId: UUID?
     public var petId: UUID?
+    public var clinicId: UUID?
     public var incidentType: SOSIncidentType
     public var priority: SOSPriority
     public var pickup: Coordinate
@@ -332,6 +506,7 @@ public struct SOSCase: Identifiable, Codable, Equatable, Sendable {
         requesterId: UUID,
         riderId: UUID? = nil,
         petId: UUID? = nil,
+        clinicId: UUID? = nil,
         incidentType: SOSIncidentType,
         priority: SOSPriority = .urgent,
         pickup: Coordinate,
@@ -353,6 +528,7 @@ public struct SOSCase: Identifiable, Codable, Equatable, Sendable {
         self.requesterId = requesterId
         self.riderId = riderId
         self.petId = petId
+        self.clinicId = clinicId
         self.incidentType = incidentType
         self.priority = priority
         self.pickup = pickup
@@ -379,6 +555,7 @@ public struct SOSRequest: Equatable, Sendable {
     public var priority: SOSPriority
     public var pickup: Coordinate
     public var destination: Coordinate?
+    public var clinicId: UUID?
     public var contactNumber: String?
     public var notes: String?
     public var attachmentURLs: [URL]
@@ -390,6 +567,7 @@ public struct SOSRequest: Equatable, Sendable {
         priority: SOSPriority = .urgent,
         pickup: Coordinate,
         destination: Coordinate? = nil,
+        clinicId: UUID? = nil,
         contactNumber: String? = nil,
         notes: String? = nil,
         attachmentURLs: [URL] = []
@@ -400,6 +578,7 @@ public struct SOSRequest: Equatable, Sendable {
         self.priority = priority
         self.pickup = pickup
         self.destination = destination
+        self.clinicId = clinicId
         self.contactNumber = contactNumber
         self.notes = notes
         self.attachmentURLs = attachmentURLs
@@ -414,4 +593,25 @@ public struct GovernmentAnnouncement: Identifiable, Codable {
     public var priority: String
     public var targetAudience: String
     public var publishedAt: Date
+    public var clinicId: UUID?
+
+    public init(
+        id: UUID = UUID(),
+        title: String,
+        content: String,
+        type: String = "general",
+        priority: String = "normal",
+        targetAudience: String = "all",
+        publishedAt: Date = Date(),
+        clinicId: UUID? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.type = type
+        self.priority = priority
+        self.targetAudience = targetAudience
+        self.publishedAt = publishedAt
+        self.clinicId = clinicId
+    }
 }

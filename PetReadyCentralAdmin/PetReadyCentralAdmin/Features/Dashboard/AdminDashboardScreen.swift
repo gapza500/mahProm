@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import MapKit
 import PetReadyShared
 
 struct AdminDashboardScreen: View {
@@ -16,11 +17,14 @@ struct AdminDashboardScreen: View {
                     hero
                     metrics
                     AdminSOSMonitorView(viewModel: sosViewModel)
-                    cuteCard("📢 Announcements", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        cuteRow(icon: "📣", title: "Send announcement", subtitle: "Broadcast to all pet parents", showChevron: true)
-                        Divider().padding(.leading, 50)
-                        cuteRow(icon: "📅", title: "Scheduled messages", subtitle: "2 announcements tomorrow", badge: "2", badgeColor: Color(hex: "A0D8F1"))
+                    NavigationLink {
+                        AdminAnnouncementsScreen()
+                    } label: {
+                        cuteCard("📢 Announcements", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                            cuteRow(icon: "📣", title: "Manage announcements", subtitle: "Target clinics or broadcast", showChevron: true)
+                        }
                     }
+                    .buttonStyle(.plain)
                     recentPetRegistrations
                 }
                 .padding()
@@ -205,12 +209,16 @@ struct AdminSOSMonitorView: View {
                             Text(item.incidentType.readableLabel)
                                 .font(.subheadline.weight(.semibold))
                             Spacer()
-                            Text(item.status.readableLabel)
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(DesignSystem.Colors.onAccentText)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color(hex: "FFB5D8"), in: Capsule())
+                            NavigationLink {
+                                AdminSOSDetailView(caseItem: item)
+                            } label: {
+                                Text(item.status.readableLabel)
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(DesignSystem.Colors.onAccentText)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(hex: "FFB5D8"), in: Capsule())
+                            }
                         }
                         if let rider = item.riderId {
                             Text("Assigned rider: \(rider.uuidString.prefix(6))")
@@ -220,6 +228,21 @@ struct AdminSOSMonitorView: View {
                             Text("Awaiting rider assignment")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                        }
+                        if Date().timeIntervalSince(item.createdAt) > 300 && item.status == .pending {
+                            Text("Waiting > 5 min")
+                                .font(.caption2.weight(.bold))
+                                .padding(6)
+                                .background(Color(hex: "FFE5A0"), in: Capsule())
+                        }
+                        if item.lastKnownLocation != nil || item.destination != nil {
+                            AdminSOSTrackMapView(
+                                pickup: item.pickup,
+                                destination: item.destination,
+                                riderLocation: item.lastKnownLocation
+                            )
+                            .frame(height: 140)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                         HStack {
                             Button {
@@ -313,6 +336,204 @@ final class AdminSOSMonitorViewModel: ObservableObject {
     }
 }
 
+private struct AdminSOSTrackPin: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
+    let tint: Color
+}
+
+struct AdminSOSTrackMapView: View {
+    let pickup: Coordinate
+    let destination: Coordinate?
+    let riderLocation: Coordinate?
+
+    @State private var region: MKCoordinateRegion
+
+    init(pickup: Coordinate, destination: Coordinate?, riderLocation: Coordinate?) {
+        self.pickup = pickup
+        self.destination = destination
+        self.riderLocation = riderLocation
+        let focus = riderLocation ?? pickup
+        let center = CLLocationCoordinate2D(latitude: focus.latitude, longitude: focus.longitude)
+        _region = State(initialValue: MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)))
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Map(coordinateRegion: $region, annotationItems: pins) { pin in
+                MapMarker(coordinate: pin.coordinate, tint: pin.tint)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Button { focusAll() } label: { labelButton("dot.viewfinder", "Fit") }
+                    Button { zoom(step: -0.5) } label: { labelButton("plus.magnifyingglass", "In") }
+                    Button { zoom(step: 0.5) } label: { labelButton("minus.magnifyingglass", "Out") }
+                }
+                HStack(spacing: 8) {
+                    Button { focus(on: pickup) } label: { labelButton("mappin", "Pickup") }
+                    if let destination { Button { focus(on: destination) } label: { labelButton("flag", "Dest") } }
+                    if let riderLocation { Button { focus(on: riderLocation) } label: { labelButton("figure.walk", "Rider") } }
+                }
+            }
+            .padding(8)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .padding(8)
+        }
+    }
+
+    private var pins: [AdminSOSTrackPin] {
+        var list: [AdminSOSTrackPin] = [
+            AdminSOSTrackPin(
+                coordinate: CLLocationCoordinate2D(latitude: pickup.latitude, longitude: pickup.longitude),
+                tint: .green
+            )
+        ]
+        if let destination {
+            list.append(
+                AdminSOSTrackPin(
+                    coordinate: CLLocationCoordinate2D(latitude: destination.latitude, longitude: destination.longitude),
+                    tint: .pink
+                )
+            )
+        }
+        if let riderLocation {
+            list.append(
+                AdminSOSTrackPin(
+                    coordinate: CLLocationCoordinate2D(latitude: riderLocation.latitude, longitude: riderLocation.longitude),
+                    tint: .blue
+                )
+            )
+        }
+        return list
+    }
+
+    private func labelButton(_ system: String, _ title: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: system)
+            Text(title).font(.caption2)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(.thinMaterial, in: Capsule())
+    }
+
+    private func focus(on coordinate: Coordinate) {
+        withAnimation {
+            region.center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            region.span = MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
+        }
+    }
+
+    private func focusAll() {
+        let coords = pins.map { $0.coordinate }
+        guard !coords.isEmpty else { return }
+        let lats = coords.map(\.latitude)
+        let lngs = coords.map(\.longitude)
+        let minLat = lats.min() ?? region.center.latitude
+        let maxLat = lats.max() ?? region.center.latitude
+        let minLng = lngs.min() ?? region.center.longitude
+        let maxLng = lngs.max() ?? region.center.longitude
+        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLng + maxLng) / 2)
+        let span = MKCoordinateSpan(latitudeDelta: max(0.01, (maxLat - minLat) * 1.4), longitudeDelta: max(0.01, (maxLng - minLng) * 1.4))
+        withAnimation { region = MKCoordinateRegion(center: center, span: span) }
+    }
+
+    private func zoom(step: Double) {
+        let factor = pow(2, step)
+        withAnimation {
+            region.span.latitudeDelta = max(0.002, min(1.0, region.span.latitudeDelta / factor))
+            region.span.longitudeDelta = max(0.002, min(1.0, region.span.longitudeDelta / factor))
+        }
+    }
+}
+
+struct AdminSOSDetailView: View {
+    let caseItem: SOSCase
+    @State private var showFullMap = false
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                cuteCard("Case Overview", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("\(caseItem.incidentType.readableLabel) • \(caseItem.priority.readableLabel)")
+                            .font(.headline)
+                        Text("Status: \(caseItem.status.readableLabel)")
+                            .font(.subheadline.weight(.semibold))
+                        if let rider = caseItem.riderId {
+                            Text("Rider: \(rider.uuidString.prefix(6))").font(.caption)
+                        }
+                        if let contact = caseItem.contactNumber {
+                            Text("Contact: \(contact)").font(.caption)
+                        }
+                    }
+                }
+
+                cuteCard("Map", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                    AdminSOSTrackMapView(
+                        pickup: caseItem.pickup,
+                        destination: caseItem.destination,
+                        riderLocation: caseItem.lastKnownLocation
+                    )
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    Button {
+                        showFullMap = true
+                    } label: {
+                        Label("Open full map", systemImage: "arrow.up.left.and.arrow.down.right.magnifyingglass")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(hex: "FFE5A0"), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+
+                cuteCard("Event Log", gradient: [Color(hex: "FFF9E5"), Color(hex: "FFFEF0")]) {
+                    ForEach(caseItem.events.suffix(12)) { event in
+                        HStack {
+                            Text(event.message).font(.caption)
+                            Spacer()
+                            Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Divider().padding(.leading, 8)
+                    }
+                }
+            }
+            .padding()
+        }
+        .background(DesignSystem.Colors.appBackground)
+        .navigationTitle("SOS \(caseItem.id.uuidString.prefix(6))")
+        .fullScreenCover(isPresented: $showFullMap) {
+            AdminFullMapView(caseItem: caseItem) { showFullMap = false }
+        }
+    }
+}
+
+struct AdminFullMapView: View {
+    let caseItem: SOSCase
+    let onClose: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            AdminSOSTrackMapView(
+                pickup: caseItem.pickup,
+                destination: caseItem.destination,
+                riderLocation: caseItem.lastKnownLocation
+            )
+            .ignoresSafeArea()
+
+            Button {
+                onClose()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.white)
+                    .padding()
+            }
+        }
+    }
+}
+
 private extension SOSIncidentType {
     var readableLabel: String {
         switch self {
@@ -323,6 +544,16 @@ private extension SOSIncidentType {
         case .heatStroke: return "Heat"
         case .transport: return "Transport"
         case .other: return "Other"
+        }
+    }
+}
+
+private extension SOSPriority {
+    var readableLabel: String {
+        switch self {
+        case .routine: return "Routine"
+        case .urgent: return "Urgent"
+        case .critical: return "Critical"
         }
     }
 }
