@@ -39,8 +39,8 @@ public final class AnnouncementService: AnnouncementServiceProtocol {
                 query = query.whereField("clinicId", isEqualTo: clinicId.uuidString)
             }
             let snapshot = try await query.getDocuments()
-            let remote = snapshot.documents.compactMap { doc -> GovernmentAnnouncement? in
-                guard let data = doc.data() else { return nil }
+            let remote: [GovernmentAnnouncement] = snapshot.documents.compactMap { doc in
+                let data = doc.data()
                 guard let json = try? JSONSerialization.data(withJSONObject: data) else { return nil }
                 return try? decoder.decode(GovernmentAnnouncement.self, from: json)
             }

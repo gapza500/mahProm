@@ -51,7 +51,7 @@ public final class AppointmentService: AppointmentServiceProtocol {
 #if canImport(FirebaseFirestore)
         do {
             let snapshot = try await db.collection("appointments").whereField("ownerId", isEqualTo: ownerId.uuidString).getDocuments()
-            let remote = snapshot.documents.compactMap { doc in
+            let remote: [Appointment] = snapshot.documents.compactMap { doc in
                 guard let data = try? JSONSerialization.data(withJSONObject: doc.data()) else { return nil }
                 return try? decoder.decode(Appointment.self, from: data)
             }
@@ -67,7 +67,7 @@ public final class AppointmentService: AppointmentServiceProtocol {
 #if canImport(FirebaseFirestore)
         do {
             let snapshot = try await db.collection("appointments").whereField("clinicId", isEqualTo: clinicId.uuidString).getDocuments()
-            let remote = snapshot.documents.compactMap { doc in
+            let remote: [Appointment] = snapshot.documents.compactMap { doc in
                 guard let data = try? JSONSerialization.data(withJSONObject: doc.data()) else { return nil }
                 return try? decoder.decode(Appointment.self, from: data)
             }
@@ -84,7 +84,8 @@ public final class AppointmentService: AppointmentServiceProtocol {
 #if canImport(FirebaseFirestore)
             do {
                 let doc = try await db.collection("appointments").document(appointmentId.uuidString).getDocument()
-                if let data = doc.data(), let json = try? JSONSerialization.data(withJSONObject: data), var decoded = try? decoder.decode(Appointment.self, from: json) {
+                let data = doc.data()
+                if let json = try? JSONSerialization.data(withJSONObject: data), var decoded = try? decoder.decode(Appointment.self, from: json) {
                     decoded.status = status
                     decoded.notes = notes
                     decoded.updatedAt = Date()
