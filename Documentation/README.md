@@ -5,6 +5,9 @@ Use this index to jump to the guide you need:
 ## Specs
 - [petready_spec.md](Specs/petready_spec.md)
 - [navigation_plan.md](Specs/navigation_plan.md)
+- [sos_case_schema.md](Specs/sos_case_schema.md)
+- [clinic_system.md](Specs/clinic_system.md)
+- [sos_case_schema.md](Specs/sos_case_schema.md)
 
 ## Guidelines
 - [PROJECT_RULES.md](Guidelines/PROJECT_RULES.md)

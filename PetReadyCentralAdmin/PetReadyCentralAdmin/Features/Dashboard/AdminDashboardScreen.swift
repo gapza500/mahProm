@@ -1,8 +1,11 @@
 import SwiftUI
+import Combine
+import MapKit
 import PetReadyShared
 
 struct AdminDashboardScreen: View {
     @StateObject private var viewModel = AdminDependencies.shared.petListViewModel
+    @StateObject private var sosViewModel = AdminSOSMonitorViewModel()
     @State private var didTriggerInitialLoad = false
     @State private var isLoading = true
     @State private var isShowingPetRegistration = false
@@ -13,18 +16,15 @@ struct AdminDashboardScreen: View {
                 VStack(spacing: 20) {
                     hero
                     metrics
-                    cuteCard("🚨 Emergency Care", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
-                        cuteRow(icon: "🆘", title: "SOS cases", subtitle: "2 little ones need help now", badge: "Active", badgeColor: Color(hex: "FF9ECD"))
-                        Divider().padding(.leading, 50)
-                        cuteRow(icon: "👨‍⚕️", title: "Online vets & helpers", subtitle: "45 vets • 28 riders ready to help")
-                        Divider().padding(.leading, 50)
-                        cuteRow(icon: "☀️", title: "Weather alert", subtitle: "Hot day in Bangkok - keep pets cool!")
+                    AdminSOSMonitorView(viewModel: sosViewModel)
+                    NavigationLink {
+                        AdminAnnouncementsScreen()
+                    } label: {
+                        cuteCard("📢 Announcements", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                            cuteRow(icon: "📣", title: "Manage announcements", subtitle: "Target clinics or broadcast", showChevron: true)
+                        }
                     }
-                    cuteCard("📢 Announcements", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        cuteRow(icon: "📣", title: "Send announcement", subtitle: "Broadcast to all pet parents", showChevron: true)
-                        Divider().padding(.leading, 50)
-                        cuteRow(icon: "📅", title: "Scheduled messages", subtitle: "2 announcements tomorrow", badge: "2", badgeColor: Color(hex: "A0D8F1"))
-                    }
+                    .buttonStyle(.plain)
                     recentPetRegistrations
                 }
                 .padding()
@@ -57,7 +57,10 @@ struct AdminDashboardScreen: View {
                     }
                 }
             }
-            .task { await reloadIfNeeded() }
+            .task {
+                await reloadIfNeeded()
+                await sosViewModel.start()
+            }
             .sheet(isPresented: $isShowingPetRegistration, onDismiss: {
                 Task { await reload() }
             }) {
@@ -125,8 +128,9 @@ struct AdminDashboardScreen: View {
     }
 
     private var metrics: some View {
-        HStack(spacing: 14) {
-            cuteMetricTile(emoji: "🆘", title: "SOS", value: "2", subtitle: "Active", colors: [Color(hex: "FFB5D8"), Color(hex: "FFD4E8")])
+        let activeSOS = sosViewModel.cases.filter { $0.status != .completed && $0.status != .cancelled }.count
+        return HStack(spacing: 14) {
+            cuteMetricTile(emoji: "🆘", title: "SOS", value: "\(activeSOS)", subtitle: "Active", colors: [Color(hex: "FFB5D8"), Color(hex: "FFD4E8")])
             cuteMetricTile(emoji: "✅", title: "Approvals", value: "8", subtitle: "Waiting", colors: [Color(hex: "A0D8F1"), Color(hex: "D4EDFF")])
             cuteMetricTile(emoji: "🔔", title: "Alerts", value: "1", subtitle: "Active", colors: [Color(hex: "FFE5A0"), Color(hex: "FFF3D4")])
         }
@@ -174,6 +178,397 @@ struct AdminDashboardScreen: View {
             } else {
                 PetRegistrationsTable(pets: viewModel.pets).padding(.top, 4)
             }
+        }
+    }
+}
+
+struct AdminSOSMonitorView: View {
+    @ObservedObject var viewModel: AdminSOSMonitorViewModel
+
+    private var activeCases: [SOSCase] {
+        viewModel.cases.filter { $0.status != .completed && $0.status != .cancelled }
+    }
+
+    var body: some View {
+        cuteCard("🚨 SOS Monitor", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
+            HStack(spacing: 12) {
+                metric("Active", value: "\(activeCases.count)")
+                metric("Assigned", value: "\(activeCases.filter { $0.riderId != nil }.count)")
+                metric("Waiting", value: "\(activeCases.filter { $0.riderId == nil }.count)")
+            }
+            Divider().padding(.leading, 50)
+            if activeCases.isEmpty {
+                Text("No open SOS cases. Good job! 🎉")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(activeCases.prefix(3)) { item in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("🆘")
+                            Text(item.incidentType.readableLabel)
+                                .font(.subheadline.weight(.semibold))
+                            Spacer()
+                            NavigationLink {
+                                AdminSOSDetailView(caseItem: item)
+                            } label: {
+                                Text(item.status.readableLabel)
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(DesignSystem.Colors.onAccentText)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Color(hex: "FFB5D8"), in: Capsule())
+                            }
+                        }
+                        if let rider = item.riderId {
+                            Text("Assigned rider: \(rider.uuidString.prefix(6))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text("Awaiting rider assignment")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        if Date().timeIntervalSince(item.createdAt) > 300 && item.status == .pending {
+                            Text("Waiting > 5 min")
+                                .font(.caption2.weight(.bold))
+                                .padding(6)
+                                .background(Color(hex: "FFE5A0"), in: Capsule())
+                        }
+                        if item.lastKnownLocation != nil || item.destination != nil {
+                            AdminSOSTrackMapView(
+                                pickup: item.pickup,
+                                destination: item.destination,
+                                riderLocation: item.lastKnownLocation
+                            )
+                            .frame(height: 140)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        }
+                        HStack {
+                            Button {
+                                Task { await viewModel.reassign(caseId: item.id) }
+                            } label: {
+                                Text("Assign / Reassign")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(DesignSystem.Colors.onAccentText)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color(hex: "A0D8F1"), in: Capsule())
+                            }
+                            Spacer()
+                            if let latest = item.events.last {
+                                Text(latest.message)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    if item.id != activeCases.prefix(3).last?.id {
+                        Divider().padding(.leading, 50)
+                    }
+                }
+            }
+            Divider().padding(.leading, 50)
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Live SOS feed")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                ForEach(viewModel.liveEvents.suffix(4)) { event in
+                    HStack {
+                        Text(event.description)
+                            .font(.caption)
+                        Spacer()
+                        Text(event.timestamp, style: .time)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    private func metric(_ title: String, value: String) -> some View {
+        VStack(spacing: 6) {
+            Text(value)
+                .font(.title3.bold())
+            Text(title.uppercased())
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+@MainActor
+final class AdminSOSMonitorViewModel: ObservableObject {
+    @Published var cases: [SOSCase] = []
+    @Published var liveEvents: [LiveEvent] = []
+
+    private let service: SOSServiceProtocol
+    private let realtime: RealtimeSyncServiceProtocol
+    private var hasStarted = false
+
+    init(service: SOSServiceProtocol = SOSServiceFactory.make(), realtime: RealtimeSyncServiceProtocol = RealtimeSyncService()) {
+        self.service = service
+        self.realtime = realtime
+    }
+
+    func start() async {
+        guard !hasStarted else { return }
+        hasStarted = true
+        cases = await service.fetchCases()
+        service.observeCases { [weak self] cases in
+            Task { @MainActor in self?.cases = cases }
+        }
+        Task {
+            let stream = await realtime.subscribe(to: "sos")
+            for await event in stream {
+                await MainActor.run {
+                    self.liveEvents.append(event)
+                }
+            }
+        }
+    }
+
+    func reassign(caseId: UUID) async {
+        let newRider = UUID()
+        _ = try? await service.acceptCase(id: caseId, riderId: newRider)
+    }
+}
+
+private struct AdminSOSTrackPin: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
+    let tint: Color
+}
+
+struct AdminSOSTrackMapView: View {
+    let pickup: Coordinate
+    let destination: Coordinate?
+    let riderLocation: Coordinate?
+
+    @State private var region: MKCoordinateRegion
+
+    init(pickup: Coordinate, destination: Coordinate?, riderLocation: Coordinate?) {
+        self.pickup = pickup
+        self.destination = destination
+        self.riderLocation = riderLocation
+        let focus = riderLocation ?? pickup
+        let center = CLLocationCoordinate2D(latitude: focus.latitude, longitude: focus.longitude)
+        _region = State(initialValue: MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)))
+    }
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Map(coordinateRegion: $region, annotationItems: pins) { pin in
+                MapMarker(coordinate: pin.coordinate, tint: pin.tint)
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 8) {
+                    Button { focusAll() } label: { labelButton("dot.viewfinder", "Fit") }
+                    Button { zoom(step: -0.5) } label: { labelButton("plus.magnifyingglass", "In") }
+                    Button { zoom(step: 0.5) } label: { labelButton("minus.magnifyingglass", "Out") }
+                }
+                HStack(spacing: 8) {
+                    Button { focus(on: pickup) } label: { labelButton("mappin", "Pickup") }
+                    if let destination { Button { focus(on: destination) } label: { labelButton("flag", "Dest") } }
+                    if let riderLocation { Button { focus(on: riderLocation) } label: { labelButton("figure.walk", "Rider") } }
+                }
+            }
+            .padding(8)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .padding(8)
+        }
+    }
+
+    private var pins: [AdminSOSTrackPin] {
+        var list: [AdminSOSTrackPin] = [
+            AdminSOSTrackPin(
+                coordinate: CLLocationCoordinate2D(latitude: pickup.latitude, longitude: pickup.longitude),
+                tint: .green
+            )
+        ]
+        if let destination {
+            list.append(
+                AdminSOSTrackPin(
+                    coordinate: CLLocationCoordinate2D(latitude: destination.latitude, longitude: destination.longitude),
+                    tint: .pink
+                )
+            )
+        }
+        if let riderLocation {
+            list.append(
+                AdminSOSTrackPin(
+                    coordinate: CLLocationCoordinate2D(latitude: riderLocation.latitude, longitude: riderLocation.longitude),
+                    tint: .blue
+                )
+            )
+        }
+        return list
+    }
+
+    private func labelButton(_ system: String, _ title: String) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: system)
+            Text(title).font(.caption2)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(.thinMaterial, in: Capsule())
+    }
+
+    private func focus(on coordinate: Coordinate) {
+        withAnimation {
+            region.center = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            region.span = MKCoordinateSpan(latitudeDelta: 0.03, longitudeDelta: 0.03)
+        }
+    }
+
+    private func focusAll() {
+        let coords = pins.map { $0.coordinate }
+        guard !coords.isEmpty else { return }
+        let lats = coords.map(\.latitude)
+        let lngs = coords.map(\.longitude)
+        let minLat = lats.min() ?? region.center.latitude
+        let maxLat = lats.max() ?? region.center.latitude
+        let minLng = lngs.min() ?? region.center.longitude
+        let maxLng = lngs.max() ?? region.center.longitude
+        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLng + maxLng) / 2)
+        let span = MKCoordinateSpan(latitudeDelta: max(0.01, (maxLat - minLat) * 1.4), longitudeDelta: max(0.01, (maxLng - minLng) * 1.4))
+        withAnimation { region = MKCoordinateRegion(center: center, span: span) }
+    }
+
+    private func zoom(step: Double) {
+        let factor = pow(2, step)
+        withAnimation {
+            region.span.latitudeDelta = max(0.002, min(1.0, region.span.latitudeDelta / factor))
+            region.span.longitudeDelta = max(0.002, min(1.0, region.span.longitudeDelta / factor))
+        }
+    }
+}
+
+struct AdminSOSDetailView: View {
+    let caseItem: SOSCase
+    @State private var showFullMap = false
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                cuteCard("Case Overview", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("\(caseItem.incidentType.readableLabel) • \(caseItem.priority.readableLabel)")
+                            .font(.headline)
+                        Text("Status: \(caseItem.status.readableLabel)")
+                            .font(.subheadline.weight(.semibold))
+                        if let rider = caseItem.riderId {
+                            Text("Rider: \(rider.uuidString.prefix(6))").font(.caption)
+                        }
+                        if let contact = caseItem.contactNumber {
+                            Text("Contact: \(contact)").font(.caption)
+                        }
+                    }
+                }
+
+                cuteCard("Map", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
+                    AdminSOSTrackMapView(
+                        pickup: caseItem.pickup,
+                        destination: caseItem.destination,
+                        riderLocation: caseItem.lastKnownLocation
+                    )
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    Button {
+                        showFullMap = true
+                    } label: {
+                        Label("Open full map", systemImage: "arrow.up.left.and.arrow.down.right.magnifyingglass")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(hex: "FFE5A0"), in: RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+
+                cuteCard("Event Log", gradient: [Color(hex: "FFF9E5"), Color(hex: "FFFEF0")]) {
+                    ForEach(caseItem.events.suffix(12)) { event in
+                        HStack {
+                            Text(event.message).font(.caption)
+                            Spacer()
+                            Text(event.timestamp, style: .time).font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Divider().padding(.leading, 8)
+                    }
+                }
+            }
+            .padding()
+        }
+        .background(DesignSystem.Colors.appBackground)
+        .navigationTitle("SOS \(caseItem.id.uuidString.prefix(6))")
+        .fullScreenCover(isPresented: $showFullMap) {
+            AdminFullMapView(caseItem: caseItem) { showFullMap = false }
+        }
+    }
+}
+
+struct AdminFullMapView: View {
+    let caseItem: SOSCase
+    let onClose: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            AdminSOSTrackMapView(
+                pickup: caseItem.pickup,
+                destination: caseItem.destination,
+                riderLocation: caseItem.lastKnownLocation
+            )
+            .ignoresSafeArea()
+
+            Button {
+                onClose()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.largeTitle)
+                    .foregroundStyle(.white)
+                    .padding()
+            }
+        }
+    }
+}
+
+private extension SOSIncidentType {
+    var readableLabel: String {
+        switch self {
+        case .injury: return "Injury"
+        case .breathing: return "Breathing"
+        case .trauma: return "Trauma"
+        case .poisoning: return "Poisoning"
+        case .heatStroke: return "Heat"
+        case .transport: return "Transport"
+        case .other: return "Other"
+        }
+    }
+}
+
+private extension SOSPriority {
+    var readableLabel: String {
+        switch self {
+        case .routine: return "Routine"
+        case .urgent: return "Urgent"
+        case .critical: return "Critical"
+        }
+    }
+}
+
+private extension SOSStatus {
+    var readableLabel: String {
+        switch self {
+        case .pending: return "Pending"
+        case .awaitingAssignment: return "Awaiting"
+        case .assigned: return "Assigned"
+        case .enRoute: return "En route"
+        case .arrived: return "Arrived"
+        case .completed: return "Completed"
+        case .cancelled: return "Cancelled"
+        case .declined: return "Declined"
         }
     }
 }

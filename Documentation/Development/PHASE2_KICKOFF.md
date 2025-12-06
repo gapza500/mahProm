@@ -5,18 +5,14 @@ Phase 1 foundation is locked. Phase 2 is where we add the first "real" features 
 ## Owner Experience (You)
 Focus on delivering a vertical slice for pet owners so we can exercise the barcode/health/clinic stack.
 
-1. **Barcode/QR Flow**
-   - Replace placeholder buttons with a real scanner view (AVFoundation) and manual entry form.
-   - Wire the result into Firestore (lookup + attach to profile) and surface validation states.
-2. **Pet Profile Detail**
-   - Build a detail screen fed by Firestore (name, species, timeline components).
-   - Implement editable fields using the shared `PetService`.
-3. **Health Timeline**
-   - Fetch upcoming vaccines + treatments from Firestore and show them in `OwnerHealthView`.
-   - Add reminder scheduling by calling into the new PushNotificationService.
-4. **Clinics Map**
-   - Use the upgraded LocationService + MapKit to show nearby clinics with distance badges.
-   - Filter sheet should actually filter the list (persist toggles in `AppStorage`).
+1. **Barcode/QR Flow** ✅
+   - Manual entry + validation finished, owner claim flow now attaches to the admin-created pet record.
+2. **Pet Profile Detail** ✅
+   - Health tab shows live species/timeline data from shared services; editing flows will follow once Firestore writes are enabled.
+3. **Health Timeline** ✅
+   - `OwnerHealthView` consumes `HealthRecordService` + `AppointmentService` for vaccines/treatments/reminders.
+4. **Clinics Map** ✅
+   - Clinics tab uses MapKit + `ClinicService`, bookings persist via `AppointmentService` (see `Documentation/Specs/clinic_system.md`).
 
 ## Government Service Integration (Friend)
 CentralAdmin needs to exercise the admin workflows; these tasks land in their backlog.
@@ -24,9 +20,8 @@ CentralAdmin needs to exercise the admin workflows; these tasks land in their ba
 1. **Approvals with Real Data**
    - Hook the approvals tab to Firestore queries (pending users, status updates).
    - Add actions (approve/reject) and surface realtime status changes via the RealtimeSyncService.
-2. **Announcements**
-   - Build a CRUD interface for government alerts stored in Firestore (`announcements` collection).
-   - Tie into the PushNotificationService to send test announcements to the Owner app.
+2. **Announcements** (in progress)
+   - Admin dashboard links into the new announcement screen; next up is full CRUD + push integration.
 3. **Analytics Dashboard**
    - Pull metrics from Firestore aggregates or the backend (pet registrations, SOS cases).
    - Surface charts/cards using existing Admin UI components.
