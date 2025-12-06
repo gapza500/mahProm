@@ -416,21 +416,19 @@ struct OwnerSOSRequestView: View {
         .cornerRadius(12)
     }
 
-    private var toastView: some View {
+    private func toastView(message: String, dismiss: @escaping () -> Void) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("SOS update").font(.caption.weight(.bold))
-                Text(cancelToastMessage)
+                Text(message)
                     .font(.caption)
             }
             Spacer()
-            Button("New SOS") {
-                showCancelToast = false
-            }
-            .font(.caption.weight(.bold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(Color(hex: "FF9ECD"), in: Capsule())
+            Button("New SOS", action: dismiss)
+                .font(.caption.weight(.bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Color(hex: "FF9ECD"), in: Capsule())
             .foregroundStyle(.white)
         }
         .padding()

@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import MapKit
 import PetReadyShared
 
@@ -111,6 +112,7 @@ struct OwnerClinicsView: View {
     }
 }
 
+@MainActor
 final class OwnerClinicsViewModel: ObservableObject {
     @Published var clinics: [Clinic] = []
     @Published var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 13.7563, longitude: 100.5018), span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08))
@@ -155,10 +157,20 @@ final class OwnerClinicsViewModel: ObservableObject {
         await MainActor.run {
             region.center = CLLocationCoordinate2D(latitude: snapshot.coordinate.latitude, longitude: snapshot.coordinate.longitude)
         }
-        let results = await clinicService.listNearbyClinics(latitude: snapshot.coordinate.latitude, longitude: snapshot.coordinate.longitude, radiusKm: 20)
-        await MainActor.run {
-            clinics = results
-            isLoading = false
+        do {
+            let results = try await clinicService.listNearbyClinics(
+                latitude: snapshot.coordinate.latitude,
+                longitude: snapshot.coordinate.longitude,
+                radiusKm: 20
+            )
+            await MainActor.run {
+                clinics = results
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "Failed to load clinics"
+                clinics = []
+            }
         }
         do {
             let loadedPets = try await petService.loadPets()
@@ -166,6 +178,7 @@ final class OwnerClinicsViewModel: ObservableObject {
         } catch {
             await MainActor.run { self.errorMessage = "Failed to load pets" }
         }
+        await MainActor.run { isLoading = false }
     }
 
     func zoom(delta: Double) {
@@ -174,13 +187,22 @@ final class OwnerClinicsViewModel: ObservableObject {
     }
 }
 
-private struct MapPin: Identifiable, Hashable {
+struct MapPin: Identifiable, Hashable {
     let id: UUID
     let coordinate: CLLocationCoordinate2D
     let title: String?
     let isUser: Bool
+
+    static func == (lhs: MapPin, rhs: MapPin) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
+@MainActor
 struct ClinicDetailView: View {
     let clinic: Clinic
     let pets: [Pet]

@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol SmartVetCommunicationServiceProtocol: AnyObject {
+public protocol SmartVetCommunicationServiceProtocol: AnyObject, Sendable {
     func listAvailableVets() async -> [VetAvailability]
     func requestConsultation(vet: VetAvailability, ownerId: UUID, petName: String) async -> ConsultationSession
     func sessions(forOwner ownerId: UUID) async -> [ConsultationSession]
@@ -12,7 +12,7 @@ public protocol SmartVetCommunicationServiceProtocol: AnyObject {
     func sendVetMessage(_ text: String, in session: ConsultationSession, vetId: UUID) async -> Message
 }
 
-public final class SmartVetCommunicationService: SmartVetCommunicationServiceProtocol {
+public final class SmartVetCommunicationService: SmartVetCommunicationServiceProtocol, @unchecked Sendable {
     public static let shared = SmartVetCommunicationService()
 
     private var vets: [VetAvailability] = []

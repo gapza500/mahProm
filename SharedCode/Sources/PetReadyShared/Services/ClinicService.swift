@@ -4,12 +4,14 @@ import CoreLocation
 import FirebaseFirestore
 #endif
 
-public protocol ClinicServiceProtocol {
+public protocol ClinicServiceProtocol: Sendable {
     func listNearbyClinics(latitude: Double, longitude: Double, radiusKm: Double) async throws -> [Clinic]
     func clinic(withId id: UUID) async throws -> Clinic?
 }
 
-public final class ClinicService: ClinicServiceProtocol {
+public final class ClinicService: ClinicServiceProtocol, @unchecked Sendable {
+    public static let shared = ClinicService()
+
     #if canImport(FirebaseFirestore)
     private let db = Firestore.firestore()
     private let decoder = JSONDecoder()

@@ -125,18 +125,12 @@ struct ClinicAnnouncementsView: View {
     var body: some View {
         List {
             Section("Targeted to this clinic") {
-                if clinicStore.clinicId == nil {
-                    Text("Set your clinic ID in ClinicIdentityStore to see targeted alerts.")
+                if isLoading {
+                    ProgressView("Loading…")
+                } else if announcements.isEmpty {
+                    Text("No announcements yet.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                } else if announcements.isEmpty {
-                    if isLoading {
-                        ProgressView("Loading…")
-                    } else {
-                        Text("No announcements yet.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
                 } else {
                     ForEach(announcements) { item in
                         VStack(alignment: .leading, spacing: 6) {
@@ -156,7 +150,7 @@ struct ClinicAnnouncementsView: View {
     }
 
     private func load() async {
-        guard let clinicId = clinicStore.clinicId else { return }
+        let clinicId = clinicStore.clinicId
         await MainActor.run { isLoading = true }
         let items = await service.fetchAnnouncements(clinicId: clinicId)
         await MainActor.run {

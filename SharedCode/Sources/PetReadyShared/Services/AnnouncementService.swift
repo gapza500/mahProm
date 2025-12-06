@@ -3,12 +3,12 @@ import Foundation
 import FirebaseFirestore
 #endif
 
-public protocol AnnouncementServiceProtocol {
+public protocol AnnouncementServiceProtocol: Sendable {
     func fetchAnnouncements(clinicId: UUID?) async -> [GovernmentAnnouncement]
     func createAnnouncement(_ announcement: GovernmentAnnouncement) async
 }
 
-public final class AnnouncementService: AnnouncementServiceProtocol {
+public final class AnnouncementService: AnnouncementServiceProtocol, @unchecked Sendable {
     public static let shared = AnnouncementService()
 
     #if canImport(FirebaseFirestore)

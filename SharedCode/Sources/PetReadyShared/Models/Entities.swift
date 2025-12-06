@@ -309,6 +309,14 @@ public struct Clinic: Identifiable, Codable, Sendable, Hashable {
         self.website = website
         self.distanceKm = distanceKm
     }
+
+    public static func == (lhs: Clinic, rhs: Clinic) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 public enum AppointmentStatus: String, Codable, CaseIterable, Sendable {
