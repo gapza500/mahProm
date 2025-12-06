@@ -11,12 +11,9 @@ import PetReadyShared
 
 @main
 struct PetReadyVetProApp: App {
+    @UIApplicationDelegateAdaptor(FirebaseAppDelegate.self) private var firebaseDelegate
     @StateObject private var appContext = VetProAppContext()
     @StateObject private var authService = AuthService()
-
-    init() {
-        AppBootstrap.configureFirebaseIfNeeded()
-    }
 
     var body: some Scene {
         WindowGroup {

@@ -12,12 +12,9 @@ import PetReadyShared
 
 @main
 struct PetReadyCentralAdminApp: App {
+    @UIApplicationDelegateAdaptor(FirebaseAppDelegate.self) private var firebaseDelegate
     @StateObject private var appContext = CentralAdminContext()
     @StateObject private var authService = AuthService()
-
-    init() {
-        AppBootstrap.configureFirebaseIfNeeded()
-    }
 
     var body: some Scene {
         WindowGroup {

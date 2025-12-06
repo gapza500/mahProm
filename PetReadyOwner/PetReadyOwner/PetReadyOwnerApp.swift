@@ -10,10 +10,10 @@ import PetReadyShared
 
 @main
 struct PetReadyOwnerApp: App {
+    @UIApplicationDelegateAdaptor(FirebaseAppDelegate.self) private var firebaseDelegate
     @StateObject private var authService: AuthService
 
     init() {
-        AppBootstrap.configureFirebaseIfNeeded()
         _authService = StateObject(wrappedValue: AuthService())
     }
 
