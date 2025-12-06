@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Coordinate: Codable, Equatable, Sendable {
+public struct Coordinate: Codable, Equatable, Hashable, Sendable {
     public var latitude: Double
     public var longitude: Double
 
