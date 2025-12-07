@@ -226,6 +226,72 @@ public struct Appointment: Identifiable, Codable {
     public var status: String
 }
 
+public enum CareEventType: String, Codable, CaseIterable, Sendable {
+    case vaccine
+    case treatment
+    case checkup
+    case grooming
+    case surgery
+    case lab
+}
+
+public enum CareEventStatus: String, Codable, CaseIterable, Sendable {
+    case scheduled
+    case inProgress
+    case completed
+    case cancelled
+}
+
+
+public struct CareEvent: Identifiable, Codable, Equatable, Sendable {
+    public let id: UUID
+    public var ownerId: UUID
+    public var petId: UUID
+    public var petName: String
+    public var clinicName: String?
+    public var vetName: String?
+    public var type: CareEventType
+    public var title: String
+    public var scheduledAt: Date
+    public var status: CareEventStatus
+    public var notes: String?
+    public var outcomeNotes: String?
+    public var createdAt: Date
+    public var updatedAt: Date
+
+    public init(
+        id: UUID = UUID(),
+        ownerId: UUID,
+        petId: UUID,
+        petName: String,
+        clinicName: String? = nil,
+        vetName: String? = nil,
+        type: CareEventType,
+        title: String,
+        scheduledAt: Date,
+        status: CareEventStatus = .scheduled,
+        notes: String? = nil,
+        outcomeNotes: String? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.ownerId = ownerId
+        self.petId = petId
+        self.petName = petName
+        self.clinicName = clinicName
+        self.vetName = vetName
+        self.type = type
+        self.title = title
+        self.scheduledAt = scheduledAt
+        self.status = status
+        self.notes = notes
+        self.outcomeNotes = outcomeNotes
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
 public struct Conversation: Identifiable, Codable {
     public let id: UUID
     public var petId: UUID
@@ -236,6 +302,34 @@ public struct Conversation: Identifiable, Codable {
     public var endedAt: Date?
 }
 
+public struct ChatMessage: Identifiable, Codable, Equatable, Sendable {
+    public let id: String
+    public var sessionId: String
+    public var senderId: String
+    public var senderRole: UserType
+    public var senderName: String?
+    public var text: String
+    public var createdAt: Date
+
+    public init(
+        id: String,
+        sessionId: String,
+        senderId: String,
+        senderRole: UserType,
+        senderName: String? = nil,
+        text: String,
+        createdAt: Date = Date()
+    ) {
+        self.id = id
+        self.sessionId = sessionId
+        self.senderId = senderId
+        self.senderRole = senderRole
+        self.senderName = senderName
+        self.text = text
+        self.createdAt = createdAt
+    }
+}
+
 public struct Message: Identifiable, Codable {
     public let id: UUID
     public var conversationId: UUID
@@ -243,6 +337,96 @@ public struct Message: Identifiable, Codable {
     public var senderType: UserType
     public var text: String
     public var createdAt: Date
+}
+
+public enum ConsultationStatus: String, Codable, CaseIterable, Sendable {
+    case waiting
+    case queued
+    case assigned
+    case inProgress
+    case completed
+    case cancelled
+}
+
+public struct ConsultationSession: Identifiable, Codable, Equatable, Hashable, Sendable {
+    public let id: String
+    public var ownerId: String
+    public var ownerName: String?
+    public var vetId: String?
+    public var vetName: String?
+    public var status: ConsultationStatus
+    public var lastMessagePreview: String?
+    public var queuePosition: Int?
+    public var etaMinutes: Int?
+    public var createdAt: Date
+    public var updatedAt: Date
+
+    public init(
+        id: String,
+        ownerId: String,
+        ownerName: String? = nil,
+        vetId: String? = nil,
+        vetName: String? = nil,
+        status: ConsultationStatus = .waiting,
+        lastMessagePreview: String? = nil,
+        queuePosition: Int? = nil,
+        etaMinutes: Int? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.ownerId = ownerId
+        self.ownerName = ownerName
+        self.vetId = vetId
+        self.vetName = vetName
+        self.status = status
+        self.lastMessagePreview = lastMessagePreview
+        self.queuePosition = queuePosition
+        self.etaMinutes = etaMinutes
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+}
+
+
+public extension ConsultationStatus {
+    var isActiveSession: Bool {
+        switch self {
+        case .waiting, .queued, .assigned, .inProgress:
+            return true
+        case .completed, .cancelled:
+            return false
+        }
+    }
+}
+
+public extension ConsultationSession {
+    var isActive: Bool { status.isActiveSession }
+}
+
+public struct VetAvailability: Identifiable, Codable, Equatable, Sendable {
+    public let id: String
+    public var displayName: String
+    public var specialties: [String]
+    public var isOnline: Bool
+    public var estimatedWaitMinutes: Int?
+    public var photoURL: URL?
+
+    public init(
+        id: String,
+        displayName: String,
+        specialties: [String] = [],
+        isOnline: Bool = true,
+        estimatedWaitMinutes: Int? = nil,
+        photoURL: URL? = nil
+    ) {
+        self.id = id
+        self.displayName = displayName
+        self.specialties = specialties
+        self.isOnline = isOnline
+        self.estimatedWaitMinutes = estimatedWaitMinutes
+        self.photoURL = photoURL
+    }
 }
 
 public struct SOSEvent: Identifiable, Codable, Equatable, Sendable {
