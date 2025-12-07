@@ -36,7 +36,11 @@ struct OwnerHomeView: View {
             NavigationStack { BarcodeClaimView() }
         }
         .sheet(isPresented: $isShowingScanner) {
-            NavigationStack { PetScanPlaceholderView() }
+            NavigationStack {
+                PetScanPlaceholderView(onPetClaimed: { _ in
+                    isShowingScanner = false
+                })
+            }
         }
     }
 

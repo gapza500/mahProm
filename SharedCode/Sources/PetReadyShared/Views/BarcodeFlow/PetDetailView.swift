@@ -112,6 +112,30 @@ public final class BarcodeClaimViewModel: ObservableObject {
         }
     }
 
+    func claimScannedCode(_ rawCode: String) {
+        let trimmed = rawCode
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+
+        guard !trimmed.isEmpty else {
+            statusMessage = "Unable to read that barcode. Please try again."
+            return
+        }
+
+        do {
+            try validator.validate(trimmed)
+            statusMessage = "Detected \(trimmed). Linking pet…"
+            Task { await claimPet(with: trimmed) }
+        } catch {
+            if let error = error as? LocalizedError,
+               let description = error.errorDescription {
+                statusMessage = "Invalid barcode: \(description)"
+            } else {
+                statusMessage = "Invalid barcode: \(error.localizedDescription)"
+            }
+        }
+    }
+
     private func claimPet(with code: String) async {
         isSaving = true
         claimedPet = nil

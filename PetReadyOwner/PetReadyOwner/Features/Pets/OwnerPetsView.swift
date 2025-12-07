@@ -71,7 +71,12 @@ struct OwnerPetsView: View {
             }
         }
         .sheet(isPresented: $showScanner) {
-            NavigationStack { PetScanPlaceholderView() }
+            NavigationStack {
+                PetScanPlaceholderView(onPetClaimed: { _ in
+                    showScanner = false
+                    Task { await viewModel.loadPets() }
+                })
+            }
         }
         .sheet(isPresented: $showManual) {
             NavigationStack {
