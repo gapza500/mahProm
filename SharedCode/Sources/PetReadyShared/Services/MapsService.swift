@@ -24,4 +24,18 @@ public struct MapsService {
         guard let url = components?.url else { throw MapsServiceError.invalidURL }
         return url
     }
+
+    public func appleMapsURL(origin: CLLocationCoordinate2D?, destination: CLLocationCoordinate2D) throws -> URL {
+        var components = URLComponents(string: "http://maps.apple.com/")
+        var queryItems: [URLQueryItem] = [
+            URLQueryItem(name: "daddr", value: "\(destination.latitude),\(destination.longitude)"),
+            URLQueryItem(name: "dirflg", value: "d")
+        ]
+        if let origin {
+            queryItems.append(URLQueryItem(name: "saddr", value: "\(origin.latitude),\(origin.longitude)"))
+        }
+        components?.queryItems = queryItems
+        guard let url = components?.url else { throw MapsServiceError.invalidURL }
+        return url
+    }
 }

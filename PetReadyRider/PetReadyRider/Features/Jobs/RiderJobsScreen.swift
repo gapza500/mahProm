@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import MapKit
 import PetReadyShared
 
 struct RiderJobsScreen: View {
@@ -138,6 +139,31 @@ struct RiderJobDetailView: View {
                         }
                     }
 
+                    if viewModel.isCaseAssignedToMe(caseItem) {
+                        NavigationLink {
+                            RiderNavigationScreen(caseId: caseId, viewModel: viewModel)
+                                .navigationBarTitleDisplayMode(.inline)
+                        } label: {
+                            riderCuteCard("Navigation", gradient: [Color(hex: "E8FFE8"), Color(hex: "F2FFF2")]) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "map.fill")
+                                        .font(.title3)
+                                    VStack(alignment: .leading) {
+                                        Text("Mission navigation")
+                                            .font(.headline)
+                                        Text("Open full-screen map to navigate")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+
                     riderCuteCard("Event Log", gradient: [Color(hex: "FFE5EC"), Color(hex: "FFF0F5")]) {
                         ForEach(caseItem.events.suffix(6)) { event in
                             VStack(alignment: .leading, spacing: 4) {
@@ -198,6 +224,65 @@ struct RiderJobDetailView: View {
     }
 }
 
+struct RiderNavigationScreen: View {
+    let caseId: UUID
+    @ObservedObject var viewModel: RiderJobsViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    private var caseItem: SOSCase? {
+        viewModel.cases.first(where: { $0.id == caseId })
+    }
+
+    var body: some View {
+        Group {
+            if let caseItem {
+                ZStack(alignment: .bottom) {
+                    RiderNavigationMapView(
+                        pickup: caseItem.pickup,
+                        destination: caseItem.destination,
+                        riderLocation: viewModel.currentLocation()
+                    )
+                    .ignoresSafeArea()
+
+                    VStack(spacing: 16) {
+                        RiderNavigationStatusBar(caseItem: caseItem)
+
+                        RiderNavigationActionsView(
+                            pickup: caseItem.pickup,
+                            destination: caseItem.destination,
+                            currentLocation: viewModel.currentLocation()
+                        )
+
+                        RiderNavigationStageControls(
+                            caseStatus: caseItem.status,
+                            startNavigation: {
+                                await viewModel.startNavigation(caseId: caseId)
+                            },
+                            completeNavigation: {
+                                await viewModel.complete(caseId: caseId)
+                            },
+                            onCompleteDismiss: {
+                                dismiss()
+                            }
+                        )
+                    }
+                    .padding()
+                    .padding(.bottom, 12)
+                    .frame(maxWidth: .infinity)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28))
+                    .padding()
+                }
+                .background(DesignSystem.Colors.appBackground)
+                .toolbar(.hidden, for: .navigationBar)
+            } else {
+                ProgressView("Loading navigation…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(DesignSystem.Colors.appBackground)
+            }
+        }
+    }
+}
+
 struct RiderJobSummaryView: View {
     let caseItem: SOSCase
 
@@ -236,6 +321,247 @@ struct RiderJobSummaryView: View {
                 }
             }
         }
+    }
+}
+
+struct RiderNavigationPanel: View {
+    let caseItem: SOSCase
+    let riderCoordinate: Coordinate?
+    let startNavigation: () async -> Void
+    let completeNavigation: () async -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            RiderNavigationMapView(
+                pickup: caseItem.pickup,
+                destination: caseItem.destination,
+                riderLocation: riderCoordinate
+            )
+            RiderNavigationActionsView(
+                pickup: caseItem.pickup,
+                destination: caseItem.destination,
+                currentLocation: riderCoordinate
+            )
+            Divider()
+            RiderNavigationStageControls(
+                caseStatus: caseItem.status,
+                startNavigation: startNavigation,
+                completeNavigation: completeNavigation
+            )
+        }
+    }
+}
+
+struct RiderNavigationStageControls: View {
+    let caseStatus: SOSStatus
+    let startNavigation: () async -> Void
+    let completeNavigation: () async -> Void
+    var onCompleteDismiss: (() -> Void)? = nil
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(stageDescription)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            switch caseStatus {
+            case .assigned:
+                actionButton(title: "Start navigation", color: Color(hex: "A0D8F1")) {
+                    await startNavigation()
+                }
+            case .enRoute:
+                actionButton(title: "Complete job", color: Color(hex: "98D8AA")) {
+                    await completeNavigation()
+                    await MainActor.run { onCompleteDismiss?() }
+                }
+            case .completed:
+                Label("Job completed", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color(hex: "98D8AA"))
+            default:
+                EmptyView()
+            }
+        }
+    }
+
+    private func actionButton(title: String, color: Color, action: @escaping () async -> Void) -> some View {
+        Button {
+            Task { await action() }
+        } label: {
+            Text(title)
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(color, in: RoundedRectangle(cornerRadius: 14))
+                .foregroundStyle(DesignSystem.Colors.onAccentText)
+        }
+    }
+
+    private var stageDescription: String {
+        switch caseStatus {
+        case .assigned:
+            return "Navigate to the owner's pickup location."
+        case .enRoute:
+            return "Confirm once you have completed the drop-off."
+        case .completed:
+            return "Thanks for completing this SOS."
+        default:
+            return "Accept the job to begin navigation."
+        }
+    }
+}
+
+struct RiderNavigationMapView: View {
+    let pickup: Coordinate
+    let destination: Coordinate?
+    let riderLocation: Coordinate?
+
+    @State private var region: MKCoordinateRegion
+
+    init(pickup: Coordinate, destination: Coordinate?, riderLocation: Coordinate?) {
+        self.pickup = pickup
+        self.destination = destination
+        self.riderLocation = riderLocation
+        let center = pickup.clLocationCoordinate
+        _region = State(initialValue: MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)))
+    }
+
+    var body: some View {
+        Map(coordinateRegion: $region, annotationItems: pins) { pin in
+            MapAnnotation(coordinate: pin.coordinate) {
+                VStack(spacing: 2) {
+                    Text(pin.label)
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.white.opacity(0.85), in: Capsule())
+                    Circle()
+                        .fill(pin.tint)
+                        .frame(width: 12, height: 12)
+                        .shadow(radius: 3)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .onAppear { updateRegion() }
+        .onChange(of: riderLocation?.latitude ?? 0) { _ in updateRegion() }
+        .onChange(of: destination?.latitude ?? 0) { _ in updateRegion() }
+    }
+
+    private var pins: [NavigationPin] {
+        var items: [NavigationPin] = [
+            NavigationPin(label: "Pickup", tint: .pink, coordinate: pickup.clLocationCoordinate)
+        ]
+        if let destination {
+            items.append(NavigationPin(label: "Clinic", tint: .blue, coordinate: destination.clLocationCoordinate))
+        }
+        if let riderLocation {
+            items.append(NavigationPin(label: "You", tint: .green, coordinate: riderLocation.clLocationCoordinate))
+        }
+        return items
+    }
+
+    private func updateRegion() {
+        guard let region = regionThatFits(pins.map(\.coordinate)) else { return }
+        self.region = region
+    }
+}
+
+private struct NavigationPin: Identifiable {
+    let id = UUID()
+    let label: String
+    let tint: Color
+    let coordinate: CLLocationCoordinate2D
+}
+
+struct RiderNavigationStatusBar: View {
+    let caseItem: SOSCase
+
+    var body: some View {
+        HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(caseItem.status.readableLabel)
+                    .font(.headline)
+                Text("SOS #\(caseItem.id.uuidString.prefix(6)) • \(caseItem.priority.readableLabel)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            VStack(alignment: .trailing, spacing: 4) {
+                Text("Pickup")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text("\(caseItem.pickup.latitude, specifier: "%.4f"), \(caseItem.pickup.longitude, specifier: "%.4f")")
+                    .font(.caption.weight(.semibold))
+                if let destination = caseItem.destination {
+                    Text("Drop-off • \(destination.latitude, specifier: "%.4f"), \(destination.longitude, specifier: "%.4f")")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+}
+
+struct RiderNavigationActionsView: View {
+    let pickup: Coordinate
+    let destination: Coordinate?
+    let currentLocation: Coordinate?
+
+    @Environment(\.openURL) private var openURL
+    @State private var mapError: String?
+    private let mapsService = MapsService()
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Navigate with Apple or Google Maps.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 12) {
+                navigationButton(title: "Apple Maps", systemImage: "map.fill") {
+                    try mapsService.appleMapsURL(
+                        origin: currentLocation?.clLocationCoordinate,
+                        destination: pickup.clLocationCoordinate
+                    )
+                }
+                navigationButton(title: "Google Maps", systemImage: "globe.americas.fill") {
+                    try mapsService.googleMapsURL(
+                        origin: currentLocation?.clLocationCoordinate,
+                        destination: pickup.clLocationCoordinate
+                    )
+                }
+            }
+
+            if let destination {
+                Text("Drop-off: \(destination.latitude, specifier: "%.4f"), \(destination.longitude, specifier: "%.4f")")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .alert("Unable to open Maps", isPresented: Binding(get: { mapError != nil }, set: { _ in mapError = nil })) {
+            Button("OK", role: .cancel) { mapError = nil }
+        } message: {
+            Text(mapError ?? "Please try again.")
+        }
+    }
+
+    private func navigationButton(title: String, systemImage: String, builder: @escaping () throws -> URL) -> some View {
+        Button {
+            do {
+                openURL(try builder())
+            } catch {
+                mapError = "Could not create a navigation link."
+            }
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(.subheadline.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(Color(hex: "A0D8F1"))
     }
 }
 
@@ -303,6 +629,34 @@ final class RiderJobsViewModel: ObservableObject {
     }
 }
 
+extension RiderJobsViewModel {
+    func currentLocation() -> Coordinate? {
+        let snapshot = locationService.latestSnapshot()
+        return Coordinate(latitude: snapshot.coordinate.latitude, longitude: snapshot.coordinate.longitude)
+    }
+
+    func isCaseAssignedToMe(_ caseItem: SOSCase) -> Bool {
+        caseItem.riderId == riderId
+    }
+
+    func startNavigation(caseId: UUID) async {
+        do {
+            _ = try await service.markEnRoute(id: caseId, riderId: riderId, etaMinutes: nil, distanceKm: nil)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func complete(caseId: UUID) async {
+        do {
+            _ = try await service.completeCase(id: caseId)
+            await WalletStore.shared.recordCompletion(amount: 400)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
 private extension SOSIncidentType {
     var readableLabel: String {
         switch self {
@@ -340,4 +694,37 @@ private extension SOSStatus {
         case .declined: return "Declined"
         }
     }
+}
+
+private extension Coordinate {
+    var clLocationCoordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+}
+
+private func regionThatFits(_ coordinates: [CLLocationCoordinate2D]) -> MKCoordinateRegion? {
+    guard let first = coordinates.first else { return nil }
+    var minLat = first.latitude
+    var maxLat = first.latitude
+    var minLon = first.longitude
+    var maxLon = first.longitude
+
+    for coordinate in coordinates.dropFirst() {
+        minLat = min(minLat, coordinate.latitude)
+        maxLat = max(maxLat, coordinate.latitude)
+        minLon = min(minLon, coordinate.longitude)
+        maxLon = max(maxLon, coordinate.longitude)
+    }
+
+    let center = CLLocationCoordinate2D(
+        latitude: (minLat + maxLat) / 2,
+        longitude: (minLon + maxLon) / 2
+    )
+
+    let span = MKCoordinateSpan(
+        latitudeDelta: max((maxLat - minLat) * 1.5, 0.01),
+        longitudeDelta: max((maxLon - minLon) * 1.5, 0.01)
+    )
+
+    return MKCoordinateRegion(center: center, span: span)
 }

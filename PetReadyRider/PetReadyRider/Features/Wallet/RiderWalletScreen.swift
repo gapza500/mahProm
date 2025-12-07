@@ -2,6 +2,8 @@ import SwiftUI
 import PetReadyShared
 
 struct RiderWalletScreen: View {
+    @StateObject private var store = WalletStore.shared
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -22,7 +24,7 @@ struct RiderWalletScreen: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("💰").font(.system(size: 40))
                     Text("Payout balance").font(.caption).foregroundStyle(.secondary)
-                    Text("฿3,280")
+                    Text("฿\(Int(store.balance))")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundStyle(
                             LinearGradient(colors: [Color(hex: "98D8AA"), Color(hex: "A0D8F1")], startPoint: .leading, endPoint: .trailing)
@@ -49,23 +51,29 @@ struct RiderWalletScreen: View {
 
     private var historyCard: some View {
         riderCuteCard("History", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-            ForEach(0..<4, id: \.self) { idx in
-                HStack(spacing: 14) {
-                    Text("💵")
-                        .font(.system(size: 24))
-                        .frame(width: 40, height: 40)
-                        .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Job #\(idx + 210)").font(.body.weight(.semibold))
-                        Text("Today").font(.caption).foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Text("+฿320")
+            if store.transactions.isEmpty {
+                Text("Complete a job to see payouts here.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(store.transactions) { txn in
+                    HStack(spacing: 14) {
+                        Text("💵")
+                            .font(.system(size: 24))
+                            .frame(width: 40, height: 40)
+                            .background(Circle().fill(.white).shadow(color: .black.opacity(0.05), radius: 4, y: 2))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(txn.description).font(.body.weight(.semibold))
+                            Text(txn.date.formatted(date: .abbreviated, time: .shortened))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    Text("+฿\(Int(txn.amount))")
                         .font(.body.weight(.bold))
                         .foregroundStyle(Color(hex: "98D8AA"))
-                }
-                .padding(.vertical, 6)
-                if idx < 3 {
+                    }
+                    .padding(.vertical, 6)
                     Divider().padding(.leading, 54)
                 }
             }
