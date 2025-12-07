@@ -8,69 +8,30 @@ struct RiderProfileScreen: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    riderCuteCard("Identity", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
-                        NavigationLink {
-                            FeaturePlaceholderView(
-                                title: "Rider Documents",
-                                message: "Placeholder for ID/passport upload bound to Firestore profile docs.",
-                                icon: "🪪",
-                                highlights: ["KYC checklist", "Status per document"]
-                            )
-                            .navigationTitle("Documents")
-                        } label: {
-                            riderCuteJobRow(icon: "📄", title: "Documents", subtitle: "Upload & verify", showChevron: true)
+                    riderCuteCard("Profile", gradient: [Color(hex: "FFE5F1"), Color(hex: "FFF0F7")]) {
+                        HStack(spacing: 16) {
+                            Circle()
+                                .fill(Color(hex: "FF9ECD"))
+                                .frame(width: 70, height: 70)
+                                .overlay(Text("🙂").font(.title))
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(authService.profile?.displayName ?? "PetReady Rider")
+                                    .font(.title3.weight(.semibold))
+                                Text(authService.profile?.email ?? "no-email@petready")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
                         }
-                        .buttonStyle(.plain)
-                        Divider().padding(.leading, 50)
-                        NavigationLink {
-                            FeaturePlaceholderView(
-                                title: "Vehicle Details",
-                                message: "Garage for license plate, insurance and inspection photos.",
-                                icon: "🏍️",
-                                highlights: ["Multiple vehicle slots", "Reminder for renewals"]
-                            )
-                            .navigationTitle("Vehicle Profile")
-                        } label: {
-                            riderCuteJobRow(icon: "🏍️", title: "Vehicle profile", subtitle: "Details & license", showChevron: true)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    riderCuteCard("Service", gradient: [Color(hex: "E8F4FF"), Color(hex: "F0F8FF")]) {
-                        NavigationLink {
-                            FeaturePlaceholderView(
-                                title: "Service Areas",
-                                message: "Map-driven settings to limit dispatch radius.",
-                                icon: "🗺️",
-                                highlights: ["Uses shared GPS stub", "Area opt-in/out"]
-                            )
-                            .navigationTitle("Service Areas")
-                        } label: {
-                            riderCuteJobRow(icon: "🗺️", title: "Service areas", subtitle: "Coverage map", showChevron: true)
-                        }
-                        .buttonStyle(.plain)
-                        Divider().padding(.leading, 50)
-                        NavigationLink {
-                            FeaturePlaceholderView(
-                                title: "Alert Preferences",
-                                message: "Pick which push/realtime topics the rider wants.",
-                                icon: "🔔",
-                                highlights: ["Quiet hours", "Job type subscriptions"]
-                            )
-                            .navigationTitle("Notifications")
-                        } label: {
-                            riderCuteJobRow(icon: "🔔", title: "Notifications", subtitle: "Alert preferences", showChevron: true)
-                        }
-                        .buttonStyle(.plain)
+                        Divider().padding(.vertical, 12)
+                        riderCuteInfoRow(icon: "🆔", title: "Rider ID", subtitle: authService.profile?.id ?? "—")
+                        riderCuteInfoRow(
+                            icon: "📍",
+                            title: "Status",
+                            subtitle: authService.profile?.status.rawValue.capitalized ?? "Pending"
+                        )
                     }
 
-                    riderCuteCard("Foundation", gradient: [Color(hex: "E8FFE8"), Color(hex: "F0FFF0")]) {
-                        NavigationLink {
-                            InfrastructurePreviewView()
-                        } label: {
-                            riderCuteJobRow(icon: "🛰️", title: "Base infrastructure", subtitle: "GPS • realtime • push", showChevron: true)
-                        }
-                        .buttonStyle(.plain)
-                    }
                     Button(action: signOut) {
                         HStack {
                             Text("Sign Out")
@@ -90,13 +51,11 @@ struct RiderProfileScreen: View {
                         )
                         .shadow(color: Color(hex: "A0D8F1").opacity(0.3), radius: 12, y: 6)
                     }
-                    VStack(spacing: 12) {
-                        Text("Made with 💖 for riders")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
+                    Text("Made with 💖 for riders")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
                 }
                 .padding()
             }

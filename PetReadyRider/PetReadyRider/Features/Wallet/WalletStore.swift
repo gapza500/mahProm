@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 @MainActor
 final class WalletStore: ObservableObject {
@@ -15,6 +16,10 @@ final class WalletStore: ObservableObject {
             WalletTransaction(id: UUID(), amount: amount, date: Date(), description: "SOS completion payout"),
             at: 0
         )
+    }
+
+    var completedJobsCount: Int {
+        transactions.count
     }
 }
 
