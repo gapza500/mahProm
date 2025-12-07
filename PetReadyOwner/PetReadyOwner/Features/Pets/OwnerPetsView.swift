@@ -20,16 +20,7 @@ struct OwnerPetsView: View {
                     } else {
                         ForEach(ownedPets) { pet in
                             NavigationLink {
-                                FeaturePlaceholderView(
-                                    title: pet.name,
-                                    message: "Pet detail will surface timeline, reminders and QR exports.",
-                                    icon: "🐾",
-                                    highlights: [
-                                        "Species: \(pet.species.rawValue.capitalized)",
-                                        "Status: \(formattedStatus(pet.status))"
-                                    ]
-                                )
-                                .navigationTitle(pet.name)
+                                OwnerPetDetailView(pet: pet)
                             } label: {
                                 petCard(name: pet.name, type: pet.species.rawValue.capitalized, status: formattedStatus(pet.status))
                             }
