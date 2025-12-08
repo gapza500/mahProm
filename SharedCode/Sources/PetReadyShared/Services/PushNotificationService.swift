@@ -9,6 +9,7 @@ public enum PushPermissionState {
     case denied
 }
 
+@MainActor
 public protocol PushNotificationServiceProtocol: AnyObject {
     var permissionState: PushPermissionState { get }
     func requestPermission() async
@@ -16,6 +17,7 @@ public protocol PushNotificationServiceProtocol: AnyObject {
     func scheduleLocalNotification(title: String, body: String, timeInterval: TimeInterval)
 }
 
+@MainActor
 public final class PushNotificationService: NSObject, PushNotificationServiceProtocol {
     public private(set) var permissionState: PushPermissionState = .notDetermined
 

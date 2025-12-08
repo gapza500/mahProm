@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 public struct InfrastructurePreviewView: View {
     private let locationService: LocationServiceProtocol
     private let pushService: PushNotificationServiceProtocol
@@ -13,13 +14,15 @@ public struct InfrastructurePreviewView: View {
 
     public init(
         locationService: LocationServiceProtocol = LocationService(),
-        pushService: PushNotificationServiceProtocol = PushNotificationService(),
+        pushService: PushNotificationServiceProtocol? = nil,
         realtimeService: RealtimeSyncServiceProtocol = RealtimeSyncService()
     ) {
+        let resolvedPushService = pushService ?? PushNotificationService()
+
         self.locationService = locationService
-        self.pushService = pushService
+        self.pushService = resolvedPushService
         self.realtimeService = realtimeService
-        _permissionState = State(initialValue: pushService.permissionState)
+        _permissionState = State(initialValue: resolvedPushService.permissionState)
         _locationStatus = State(initialValue: locationService.authorizationStatusDescription)
     }
 
