@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>GIDClientID</key>
+	<string>54875193500-659u13l1pd0n8bt0kjmvig6tep72vcht.apps.googleusercontent.com</string>
 	<key>NSCameraUsageDescription</key>
 	<string>PetReady uses the camera to scan pet barcodes.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PetReady uses your location to show nearby clinics and keep your pet’s check-ins accurate.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
