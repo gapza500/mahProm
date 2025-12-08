@@ -37,7 +37,7 @@ struct OwnerChatView: View {
         .task(id: ownerProfile?.id) {
             viewModel.bind(to: ownerProfile)
         }
-        .onChange(of: viewModel.sessions) { sessions in
+        .onChange(of: viewModel.sessions) { _, sessions in
             guard let current = activeChatSession else { return }
             guard let updated = sessions.first(where: { $0.id == current.id }) else {
                 activeChatSession = nil
